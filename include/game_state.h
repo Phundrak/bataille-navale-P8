@@ -3,7 +3,7 @@
 
 #include "cell.h"
 #include "result.h"
-#include "camps.h"
+#include "camp.h"
 #include "darray.h"
 #include "camp_allocator.h"
 
