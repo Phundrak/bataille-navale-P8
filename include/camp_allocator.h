@@ -8,6 +8,6 @@ typedef struct camp_allocator_s {
 	void (*put_in_camp)(struct camp_allocator_s *, game_state_t *, player_t *);
 } camp_allocator_t;
 
-camp_allocator_t *new_single_allocator();
+camp_allocator_t *newSingleAllocator();
 
 #endif /* CAMP_ALLOCATOR_H */

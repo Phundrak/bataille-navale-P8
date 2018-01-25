@@ -16,7 +16,7 @@ typedef struct game_state_s {
 	darray_t *camps;
 } game_state_t;
 
-game_state_t *new_game();
-result_t do_action(game_state_t *, player_t *, point_t);
-int turn_end_update(game_state_t *);
+game_state_t *newGame();
+result_t doAction(game_state_t *, player_t *, point_t);
+int turnEndUpdate(game_state_t *);
 #endif /* GAME_STATE_H */

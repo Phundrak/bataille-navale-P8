@@ -11,6 +11,6 @@ typedef struct player_s {
 	int is_alive;
 } player_t;
 
-player_t *new_local_player();
+player_t *newLocalPlayer();
 
 #endif /* PLAYER_H */

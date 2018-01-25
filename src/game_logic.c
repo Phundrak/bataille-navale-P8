@@ -7,15 +7,15 @@
    nombre d'équipes
    type de partie
  */
-game_state_t *new_game(/*Options*/) {
+game_state_t *newGame(/*Options*/) {
 	game_state_t *ret = calloc(sizeof(*ret), 1);
 
 	ret->width = 17 * 2;
 	ret->height = 17;
 	ret->grid = calloc(sizeof(cell_t), ret->width * ret->height);
-	ret->camps = darray_new(sizeof(camp_t*));
+	ret->camps = darrayNew(sizeof(camp_t*));
 
 	// Chacun pour soi
-	ret->camp_allocator = new_single_allocator();
+	ret->camp_allocator = newSingleAllocator();
 	return ret;
 }

@@ -9,6 +9,6 @@ typedef struct camp_s {
 	int is_alive;
 } camp_t;
 
-camp_t *new_camp();
+camp_t *newCamp();
 
 #endif /* CAMP_H */

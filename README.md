@@ -39,11 +39,11 @@ Tour par tour classique
 	* Les joueurs placent les bateaux, superposition interdites
 * Boucle de jeu:
 	* Pour chaque camps:
-	  * Un utilisateur est déterminé
-	  * L'utilisateur désigne une case
-	  * Touché/Raté avec les coordonnées sont annoncés :
-		  * soit à l'utilisateur et au posesseur de la case ciblé
-		  * soit à tout le monde
+	  * Pour chaque utilisateur du camps:
+		* L'utilisateur désigne une case
+		* Touché/Raté avec les coordonnées sont annoncés :
+			* soit à l'utilisateur et au posesseur de la case ciblé
+			* soit à tout le monde
 	* Si un utilisateur n'a plus de bateaux, il ne peut plus etre considéré pour faire un choix.
 	* Si un camp n'a plus d'utilisateur, le camp est considéré mort.
 	* Si il ne reste qu'un camp vivant, terminer.

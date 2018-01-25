@@ -11,9 +11,9 @@ static void single_allocate_camp(camp_allocator_t *self, game_state_t *game, pla
 	(void)self;
 	// 1 camp par joueur
 	// 1 joueur par camp
-	camp_t *camp = new_camp();
-	darray_push_back(camp->players, &p);
-	darray_push_back(game->camps, &p);
+	camp_t *camp = newCamp();
+	darrayPushBack(camp->players, &p);
+	darrayPushBack(game->camps, &p);
 	/* TODO: Demander au joueur de placer ses bateaux */
 }
 
