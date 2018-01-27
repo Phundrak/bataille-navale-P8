@@ -5,6 +5,7 @@ Tableau dynamique avec
 `insert`
 `erase`
 `size`
+`get`
 `push_back`
 `pop_back`
 `destroy`
@@ -25,6 +26,8 @@ width, height
 
 /* Objet qui prend en parametre un joueur et lui affecte un camp */
 camp_allocator
+
+ncamps;
 camps[]
 ```
 
@@ -37,19 +40,20 @@ bateau_*
 ```
 
 L'état indique si la cellule est occupé par un bateau ou non, et
-si un canon a tirer dessus.
+si un canon a tiré dessus.
 
 camp_allocator:
 
+Place un joueur dans un camp existant ou en crée un nouveau
 ```
-camp_t *(*get_camp)(camp_allocator *, game_state *, joueur_t);
+void (*put_in_camp)(camp_allocator *, game_state *, joueur_t);
 ```
 
 camps:
 
 ```
 /* Tableau terminé par pointeur null */
-joueur_t (*get_players)(camp_t *);
+darray_t players;
 is_alive
 ```
 
