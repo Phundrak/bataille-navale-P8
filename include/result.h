@@ -4,7 +4,8 @@
 typedef enum {
 	REDO = -1,
 	MISS,
-	HIT
+	HIT,
+	DROWN
 } result_t;
 
 #endif /* RESULT_H */
