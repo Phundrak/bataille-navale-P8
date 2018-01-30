@@ -24,7 +24,7 @@ game_state_t *newGame(/*Options*/) {
 
 int drownBoat(struct game_state_s *game, int x, int y, unsigned char boat_id) {
   cell_t *current_cell;
-  point_t point2;
+  /* point_t point2; */
 
   /* La fonction ne renvoie 0 (zero, `faux`) que si la fonction ne renvoie 0 (zero, `faux`) que si une pièce du bateau testé n'a pas été touchée */
 
