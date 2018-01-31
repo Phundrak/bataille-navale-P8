@@ -2,3 +2,7 @@
 \.idea/
 
 cmake-build-debug/
+
+gmon\.out
+
+*.out
