@@ -1,0 +1,11 @@
+* Style de code
+
+Le code doit être indenté. La largeur de l'indentation n’est pas importante tant qu’elle reste constante au sein du même fichier.
+
+Chaque objet, que ce soit des fonctions, variables ou macros, doivent impérativement avoir un nom significatif.
+
+Les objets doivent être nommés ainsi :
+- macros : =ALL_CAPS=
+- variables locales : =snake_case=
+- variables globales : =UpperCamelCase=
+- fonctions : =lowerCamelCase=
