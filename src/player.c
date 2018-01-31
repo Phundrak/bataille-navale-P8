@@ -10,6 +10,7 @@ static point_t playerLocalAction(player_t *self, game_state_t *game) {
      TODO:
      Afficher l'état du jeu
      demander entrée coordonnées de tir
+     Lucien : rotation des pièces
   */
   return (point_t){0, 0};
 }
