@@ -6,6 +6,7 @@ typedef struct {
 		struct {
 			int has_boat : 1;
 			int has_exploded : 1;
+			int has_sunk : 1;
 		};
 		unsigned char state;
 	};
@@ -13,3 +14,15 @@ typedef struct {
 } cell_t;
 
 #endif
+
+/*
+sunk/expl/boat
+000
+001
+010
+011
+100
+101
+110
+111
+*/

@@ -1,5 +1,6 @@
 #include <player.h>
 #include <stdlib.h>
+#include <stdbool.h>
 
 typedef struct {
 	player_t base;
@@ -25,6 +26,56 @@ player_t *newLocalPlayer() {
 	ret->base.setup_boats = playerLocalSetBoats;
 	return &ret->base;
 }
+
+enum color {BLUE, CYAN, RED, LIGHT_RED, WHITE, BLACK};
+
+bool in_zone (int pos, game_state_t *user){
+	int userzone_begin = game->width * user->owned_rect[0]->y + user->owned_rect[0]->x
+	int userzone_end = game->width * user->owned_rect[1]->y + user->owned_rect[1]->x
+	if (pos >= userzone_begin && pos <= userzone_end)
+		return TRUE;
+	return FALSE;
+}
+
+int * tab_color (player_t *user, game_state_t *game){ // return tableau des couleurs du jeu.
+	int lng = game.width * game.height;
+	int grid_color[lng];
+	for (int i=0 ; i<lng ; ++i){
+		
+		if (in_zone(i, user) == FALSE && game->grid[i]->has_boat == 0 && game->grid[i]->has_exploded == 0)
+			grid_color[i] = BLUE;
+		else if (in_zone(i, user) == FALSE && game->grid[i]->has_boat == 0 && game->grid[i]->has_exploded == 1)
+			grid_color[i] = CYAN;
+		else if (in_zone(i, user) == FALSE && game->grid[i]->has_boat == 1 && game->grid[i]->has_exploded == 1){
+			if ( drownBoat(game, i%game->width, i/game->width, game->grid->boat_id) == 1 )
+				grid_color[i] = LIGHT_RED;
+			else
+				grid_color[i] = RED;
+		}
+		else if (in_zone(i, user) == TRUE && game->grid[i]->has_boat == 0 && game->grid[i]->has_exploded == 0)
+			grid_color[i] = CYAN;
+		else if (in_zone(i, user) == TRUE && game->grid[i]->has_boat == 1 && game->grid[i]->has_exploded == 0)
+			grid_color[i] = WHITE;
+		else if (in_zone(i, user) == TRUE && game->grid[i]->has_boat == 1 && game->grid[i]->has_exploded == 1){
+			if ( drownBoat(game, i%game->width, i/game->width, game->grid->boat_id) == 1 )
+				grid_color[i] = LIGHT_RED;
+			else
+				grid_color[i] = RED;
+		}
+		/*
+		enum color_enmy = {BLUE, BLUE, CYAN, RED, NO, NO, NO, LIGHT_RED}
+		enum color_ally = {CYAN, WHITE, CYAN, RED, NO, NO, NO, LIGHT_RED}
+		if (in_zone(i, user) == FALSE)	
+			grid_color[i] = color_enmy[game->grid.state]
+		else
+			grid_color[i] = color_ally[game->grid.state]
+		*/
+	}
+	return grid_color;
+}
+	
+	
+
 
 char pieces[][5][5] = {
 	{
