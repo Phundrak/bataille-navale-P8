@@ -8,7 +8,7 @@ set(TGT "bataille_navale")
 set(${TGT}_VERSION_MAJOR 0)
 set(${TGT}_VERSION_MINOR 1)
 
-set(CC_COVERAGE_COMPILE_FLAGS "-pedantic -Wall -Wextra")
+set(CC_COVERAGE_COMPILE_FLAGS "-pedantic -Wall -Wextra -Werror")
 set(CMAKE_C_FLAGS_DEBUG "${CC_COVERAGE_COMPILE_FLAGS} -DDebug -g -pg")
 set(CMAKE_C_FLAGS_RELEASE "${CC_COVERAGE_COMPILE_FLAGS} -O3")
 
