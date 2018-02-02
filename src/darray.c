@@ -25,7 +25,7 @@ void darrayInsert(darray_t *self, void *pos, void *elem) {
     size = darraySize(self);
     new_array = realloc(self->begin, (darraySize(self) + 1) * self->element_size);
     if (!new_array) {
-      printf("Failed memory reallocation at %s:%d\nAborting...", __FILE__,
+      fprintf(stderr, "Failed memory reallocation at %s:%d\nAborting...", __FILE__,
              __LINE__ - 2);
       exit(PTR_ERROR);
     }
