@@ -15,4 +15,11 @@ typedef struct player_s {
 
 player_t *newLocalPlayer();
 
+/* rotation d'une pièce du joueur de 90° dans le sens des aiguilles d'une
+   montre */
+void rotate(char piece[5][5], int rotation_nb);
+
+/* debug */
+void print_piece(char piece[5][5]);
+
 #endif /* PLAYER_H */
