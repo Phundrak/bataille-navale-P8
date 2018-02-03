@@ -7,7 +7,7 @@ typedef struct {
 	void *begin;
 	void *end;
 	size_t element_size;
-  size_t capacity;
+	size_t capacity;
 } darray_t;
 
 darray_t *darrayNew(size_t element_size);

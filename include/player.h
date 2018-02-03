@@ -3,6 +3,8 @@
 
 #include "point.h"
 
+#define PIECE_SIZE 5
+
 struct game_state_s;
 typedef struct game_state_s game_state_t;
 
@@ -20,6 +22,6 @@ player_t *newLocalPlayer();
 void rotate(char piece[5][5], int rotation_nb);
 
 /* debug */
-void print_piece(char piece[5][5]);
+void printPiece(char piece[PIECE_SIZE][PIECE_SIZE]);
 
 #endif /* PLAYER_H */
