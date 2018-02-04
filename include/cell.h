@@ -7,6 +7,7 @@ typedef struct {
 			int has_boat : 1;
 			int has_exploded : 1;
 			int has_sunk : 1;
+			int marked : 1;
 		};
 		unsigned char state;
 	};
