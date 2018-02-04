@@ -111,33 +111,26 @@ static void cursorMovement(point_t *r, game_state_t *game) {
 }
 
 static point_t playerLocalAction(player_t *self, game_state_t *game) {
-	/* 
-	   TODO: 
-	   Afficher l'état du jeu
-	   demander entrée coordonnées de tir
-	*/
 	point_t r = {game->width / 2, game->height / 2};
 	while (1) {
 		color_t *arr = stateToView(game, self);
-
 		arr[game->width * r.y + r.x] = BLACK;
 		printColorArray(game, arr);
 		printf("Tour du joueur %s\n\r", self->name);
 		refresh();
 		free(arr);
-		int c;
-	ignore:
-		switch(c = getch()) {
-		case ' ':
-			return r;
-		case '\033':
-			cursorMovement(&r, game);
-			break;
-		case 4:
-			interruptHandler(0);
-			break;
-		default:
-			goto ignore;
+		while (1) {
+			int c = getch();
+			if (c == ' ')
+				return r;
+			else if (c == '\033') {
+				cursorMovement(&r, game);
+				break;
+			}
+			else if (c == 4) {
+				interruptHandler(0);
+				break;
+			}
 		}
 	}
 	// unreachable
@@ -145,59 +138,54 @@ static point_t playerLocalAction(player_t *self, game_state_t *game) {
 }
 
 static void playerLocalSetBoats(player_t *self, game_state_t *game) {
-	static int id = 1;
-
 	point_t prev = {0, 0};
 	point_t r = {
-		self->owned_rect[0].x + self->owned_rect[1].x,
-		self->owned_rect[0].y + self->owned_rect[1].y
+		(self->owned_rect[0].x + self->owned_rect[1].x) / 2,
+		(self->owned_rect[0].y + self->owned_rect[1].y) / 2
 	};
-	r.x /= 2;
-	r.y /= 2;
 	for(int i = 0; i < 7;) {
+		if (game->cheat > -1)
+			i = game->cheat;
 		char boat_mem[5][5];
 		char (*boat)[5][5] = &boat_mem;
 		memcpy(boat, Pieces[i], sizeof(boat_mem));
-	init:;
-		color_t *arr = stateToView(game, self);
-		int k = 0;
-		int coll = blitBoat(boat, arr, r, game, &k);
-		printColorArray(game, arr);
-		printf("[%s] Flèches pour déplacer, espace pour valider\n\r", self->name);
-
-		int c;
-		switch(c = getch()) {
-		case ' ':
-			if (!coll) {
-				prev = r;
-				++i;
-				blitToGrid(boat, r, game, id++);
-				r = (point_t) {
-					self->owned_rect[0].x + self->owned_rect[1].x,
-					self->owned_rect[0].y + self->owned_rect[1].y
-				};
-				r.x /= 2;
-				r.y /= 2;
+		while (1) {
+			color_t *arr = stateToView(game, self);
+			int k = 0;
+			int coll = blitBoat(boat, arr, r, game, &k);
+			printColorArray(game, arr);
+			printf("[%s] Flèches pour déplacer, espace pour valider\n\r", self->name);
+			// C'était soit switch et goto, soit une série de if-else
+			int c = getch();
+			if (c == ' ') {
+				if (!coll) {
+					prev = r;
+					++i;
+					blitToGrid(boat, r, game, ++game->alloc_id);
+					r = (point_t) {
+						(self->owned_rect[0].x + self->owned_rect[1].x) / 2,
+						(self->owned_rect[0].y + self->owned_rect[1].y) / 2
+					};
+					if (game->cheat > -1)
+						i = 10;
+				}
+				else
+					r = prev;
+				free(arr);
+				break;
 			}
-			else
-				r = prev;
-			break;
-		case 'r':
-			rotate(*boat, 1);
-			goto init;
-			break;
-		case '\033':
-			cursorMovement(&r, game);
-			goto init;
-		case 4:
-			interruptHandler(0);
-			break;
+			else if (c == 'r') 
+				rotate(*boat, 1);
+			else if (c == '\033') 
+				cursorMovement(&r, game);
+			else if (c == 4) 
+				interruptHandler(0);
+			free(arr);
 		}
-		
-		free(arr);
 	}
-
 	self->n_boats = 7;
+	if (game->cheat > -1)
+		self->n_boats = 1;
 }
 
 player_t *newLocalPlayer() {

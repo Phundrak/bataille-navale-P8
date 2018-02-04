@@ -16,6 +16,7 @@ game_state_t *newGame(/*Options*/) {
 	ret->height = 17;
 	ret->grid = calloc(sizeof(cell_t), (size_t)(ret->width * ret->height));
 	ret->camps = darrayNew(sizeof(camp_t *));
+	ret->cheat = -1;
 
 	// Chacun pour soi
 	ret->camp_allocator = newSingleAllocator();

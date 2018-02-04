@@ -32,10 +32,14 @@ int main(int argc, char *argv[argc])
 	timeout(-1);
 	curs_set(0);
 	refresh();
-	(void)argv;
-	(void)argc;
 	
 	game_state_t *game = newGame();
+
+	if (argc >= 2) {
+		game->cheat = atoi(argv[1]);
+		if (game->cheat < 0 || game->cheat >= 7)
+			game->cheat = -1;
+	}
 
 	// Cas d'un jeu deux joueurs local
 	{
