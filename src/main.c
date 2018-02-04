@@ -4,6 +4,7 @@
 #include <player.h>
 #include <stdio.h>
 #include <curses.h>
+#include <string.h>
 
 void interruptHandler(int s) {
 	(void)s;
@@ -19,8 +20,8 @@ void interruptHandler(int s) {
 
 int main(int argc, char *argv[argc])
 {
-	struct sigaction s = {0};
-
+	struct sigaction s;
+	memset(&s, 0, sizeof(s));
 	s.sa_handler = interruptHandler;
 	sigemptyset(&s.sa_mask);	
 	sigaction(SIGINT, &s, 0);
