@@ -1,5 +1,6 @@
 #include <player.h>
 #include <stdlib.h>
+#include <stdbool.h>
 
 typedef struct {
   player_t base;
@@ -25,38 +26,78 @@ player_t *newLocalPlayer() {
   return &ret->base;
 }
 
-char pieces[][5][5] = {{{1, 1, 0, 0, 0},
-                        {1, 1, 0, 0, 0},
-                        {0, 0, 0, 0, 0},
-                        {0, 0, 0, 0, 0},
-                        {0, 0, 0, 0, 0}},
-                       {{1, 1, 1, 1, 0},
-                        {1, 1, 1, 1, 0},
-                        {0, 0, 0, 0, 0},
-                        {0, 0, 0, 0, 0},
-                        {0, 0, 0, 0, 0}},
-                       {{1, 1, 0, 0, 0},
-                        {0, 0, 0, 0, 0},
-                        {0, 0, 0, 0, 0},
-                        {0, 0, 0, 0, 0},
-                        {0, 0, 0, 0, 0}},
-                       {{1, 1, 1, 0, 0},
-                        {0, 0, 0, 0, 0},
-                        {0, 0, 0, 0, 0},
-                        {0, 0, 0, 0, 0},
-                        {0, 0, 0, 0, 0}},
-                       {{1, 1, 1, 1, 0},
-                        {0, 0, 0, 0, 0},
-                        {0, 0, 0, 0, 0},
-                        {0, 0, 0, 0, 0},
-                        {0, 0, 0, 0, 0}},
-                       {{1, 1, 1, 1, 1},
-                        {0, 0, 0, 0, 0},
-                        {0, 0, 0, 0, 0},
-                        {0, 0, 0, 0, 0},
-                        {0, 0, 0, 0, 0}},
-                       {{1, 1, 1, 1, 0},
-                        {0, 0, 0, 1, 0},
-                        {0, 0, 0, 1, 0},
-                        {0, 0, 0, 0, 0},
-                        {0, 0, 0, 0, 0}}};
+enum color {BLUE, CYAN, RED, LIGHT_RED, WHITE, BLACK};
+
+bool in_zone (int pos, game_state_t *user){
+	int userzone_begin = game->width * user->owned_rect[0]->y + user->owned_rect[0]->x
+	int userzone_end = game->width * user->owned_rect[1]->y + user->owned_rect[1]->x
+	if (pos >= userzone_begin && pos <= userzone_end)
+		return TRUE;
+	return FALSE;
+}
+
+int * tab_color (player_t *user, game_state_t *game){ // return tableau des couleurs du jeu.
+	int lng = game.width * game.height;
+	int grid_color[lng];
+	enum color_enmy = {BLUE, BLUE, CYAN, RED, NO, NO, NO, LIGHT_RED}
+	enum color_ally = {CYAN, WHITE, CYAN, RED, NO, NO, NO, LIGHT_RED}
+	for (int i=0 ; i<lng ; ++i){
+		if (in_zone(i, user) == FALSE)	
+			grid_color[i] = color_enmy[game->grid.state]
+		else
+			grid_color[i] = color_ally[game->grid.state]
+	}
+	return grid_color;
+}
+
+char pieces[][5][5] = {
+	{
+		{1, 1, 0, 0, 0},
+		{1, 1, 0, 0, 0},
+		{0, 0, 0, 0, 0},
+		{0, 0, 0, 0, 0},
+		{0, 0, 0, 0, 0}
+	},
+	{
+		{1, 1, 1, 1, 0},
+		{1, 1, 1, 1, 0},
+		{0, 0, 0, 0, 0},
+		{0, 0, 0, 0, 0},
+		{0, 0, 0, 0, 0}
+	},
+	{
+		{1, 1, 0, 0, 0},
+		{0, 0, 0, 0, 0},
+		{0, 0, 0, 0, 0},
+		{0, 0, 0, 0, 0},
+		{0, 0, 0, 0, 0}
+	},
+	{
+		{1, 1, 1, 0, 0},
+		{0, 0, 0, 0, 0},
+		{0, 0, 0, 0, 0},
+		{0, 0, 0, 0, 0},
+		{0, 0, 0, 0, 0}
+	},
+	{
+		{1, 1, 1, 1, 0},
+		{0, 0, 0, 0, 0},
+		{0, 0, 0, 0, 0},
+		{0, 0, 0, 0, 0},
+		{0, 0, 0, 0, 0}
+	},
+	{
+		{1, 1, 1, 1, 1},
+		{0, 0, 0, 0, 0},
+		{0, 0, 0, 0, 0},
+		{0, 0, 0, 0, 0},
+		{0, 0, 0, 0, 0}
+	},
+	{
+		{1, 1, 1, 1, 0},
+		{0, 0, 0, 1, 0},
+		{0, 0, 0, 1, 0},
+		{0, 0, 0, 0, 0},
+		{0, 0, 0, 0, 0}
+	}
+};
