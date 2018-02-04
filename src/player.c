@@ -154,7 +154,7 @@ static void playerLocalSetBoats(player_t *self, game_state_t *game) {
 			int k = 0;
 			int coll = blitBoat(boat, arr, r, game, &k);
 			printColorArray(game, arr);
-			printf("[%s] Flèches pour déplacer, espace pour valider\n\r", self->name);
+			printf("[%s] Flèches pour déplacer, r pour tourner, espace pour valider\n\r", self->name);
 			// C'était soit switch et goto, soit une série de if-else
 			int c = getch();
 			if (c == ' ') {
