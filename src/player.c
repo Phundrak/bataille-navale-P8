@@ -16,11 +16,11 @@ extern char Pieces[][PIECE_SIZE][PIECE_SIZE];
 
 void printColorArray(game_state_t *game, color_t *arr) {
 	// Partant du principe que chaque case a une couleur différente (pire cas)
-	// chaque case cause l'émission d'un espace + de 5 caracteres de controle
+	// chaque case cause l'émission de deux espace + de 5 caracteres de controle
 	// chaque fin de ligne cause 6 caracteres
 	// 4 caracteres sont utilisé au début pour nettoyer l'écran et
 	// 5 pour restaurer la couleur de fond par défaut
-	char *buf = malloc(game->height * game->width * sizeof(char) * 6 + (game->height * 7) + 9);
+	char *buf = malloc(game->height * game->width * sizeof(char) * 7 + (game->height * 7) + 9);
 	buf[0] = 0;
 	char *it = buf;
 	it += sprintf(it, "\033[2J\033[0;0f");
@@ -32,7 +32,7 @@ void printColorArray(game_state_t *game, color_t *arr) {
 				it += sprintf(it, "\033[%dm", c);
 				current = c;
 			}
-			it += sprintf(it, " ");
+			it += sprintf(it, "  ");
 		}
 		current = BLACK;
 		it += sprintf(it, "\033[0m\n\r");
