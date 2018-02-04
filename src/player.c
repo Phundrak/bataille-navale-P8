@@ -1,98 +1,228 @@
 #include <player.h>
 #include <stdlib.h>
-<<<<<<< HEAD
-#include <stdbool.h>
-=======
-#include <memory.h>
-
+#include <game_state.h>
+#include <unistd.h>
+#include <curses.h>
+#include <string.h>
 #ifdef Debug
 #include <stdio.h>
 #endif
->>>>>>> origin/devel
 
 typedef struct {
 	player_t base;
 } local_player_t;
 
+extern char Pieces[][PIECE_SIZE][PIECE_SIZE];
+
+void printColorArray(game_state_t *game, color_t *arr) {
+	// Partant du principe que chaque case a une couleur différente (pire cas)
+	// chaque case cause l'émission d'un espace + de 5 caracteres de controle
+	// chaque fin de ligne cause 6 caracteres
+	// 4 caracteres sont utilisé au début pour nettoyer l'écran et
+	// 5 pour restaurer la couleur de fond par défaut
+	char *buf = malloc(game->height * game->width * sizeof(char) * 6 + (game->height * 7) + 9);
+	buf[0] = 0;
+	char *it = buf;
+	it += sprintf(it, "\033[2J\033[0;0f");
+	color_t current = BLACK;
+	for (int i = 0; i < game->height; ++i) {
+		for (int j = 0; j < game->width; ++j) {
+			color_t c = arr[game->width * i + j];
+			if (c != current) {
+				it += sprintf(it, "\033[%dm", c);
+				current = c;
+			}
+			it += sprintf(it, " ");
+		}
+		current = BLACK;
+		it += sprintf(it, "\033[0m\n\r");
+	}
+	it += sprintf(it, "\033[0m");
+	puts(buf);
+	free(buf);
+}
+
+void blitToGrid(char (*piece)[5][5], point_t pos, game_state_t *game, int id) {
+	for (int i = 0; i < 5; ++i)
+		for (int j = 0; j < 5; ++j) {
+			char v = (*piece)[i][j];
+			if (!v)
+				continue;
+			if (j + pos.x >= game->width) {
+				continue;
+			}
+			if (i + pos.y >= game->height) {
+				continue;
+			}
+			cell_t *c = &game->grid[game->width * (i + pos.y) + (j + pos.x)];
+			c->has_boat |= 1;
+			c->boat_id = id;
+		}
+}
+
+int blitBoat(char (*piece)[5][5], color_t *arr, point_t pos, game_state_t *game, int *add) {
+	int acc = 0;
+	for (int i = 0; i < 5; ++i)
+		for (int j = 0; j < 5; ++j) {
+			char v = (*piece)[i][j];
+			if (!v)
+				continue;
+			if (j + pos.x >= game->width) {
+				acc += 1 + game->width - (j + pos.x);
+				continue;
+			}
+			if (i + pos.y >= game->height) {
+				acc += 1 + game->height - (i + pos.y);
+				continue;
+			}
+			color_t *c = &arr[game->width * (i + pos.y) + (j + pos.x)];
+			acc += (*c != CYAN);
+			add[0] += 1;
+			*c = WHITE;
+		}
+	return acc;
+}
+
+static void cursorMovement(point_t *r, game_state_t *game) {
+	switch(getch()) {
+	case '[':
+		switch(getch()) {
+		case 'A':
+			if (r->y > 0)
+				--r->y;
+			break;
+		case 'B':
+			if (r->y < game->height - 1)
+				++r->y;
+			break;
+		case 'C':
+			if (r->x < game->width - 1)
+				++r->x;
+			break;
+		case 'D':
+			if (r->x > 0)
+				--r->x;
+			break;
+		default:
+			break;
+		}
+		break;
+	}
+}
+
 static point_t playerLocalAction(player_t *self, game_state_t *game) {
-	/*
-		 TODO:
-		 Afficher l'état du jeu
-		 demander entrée coordonnées de tir
+	/* 
+	   TODO: 
+	   Afficher l'état du jeu
+	   demander entrée coordonnées de tir
 	*/
-	return (point_t){0, 0};
+	point_t r = {game->width / 2, game->height / 2};
+	while (1) {
+		color_t *arr = stateToView(game, self);
+
+		arr[game->width * r.y + r.x] = BLACK;
+		printColorArray(game, arr);
+		printf("Tour du joueur %s\n\r", self->name);
+		refresh();
+		free(arr);
+		int c;
+	ignore:
+		switch(c = getch()) {
+		case ' ':
+			return r;
+		case '\033':
+			cursorMovement(&r, game);
+			break;
+		case 4:
+			interruptHandler(0);
+			break;
+		default:
+			goto ignore;
+		}
+	}
+	// unreachable
+	return r;
 }
 
 static void playerLocalSetBoats(player_t *self, game_state_t *game) {
-	local_player_t *p = (void *)self;
+	static int id = 1;
+
+	point_t prev = {0, 0};
+	point_t r = {
+		self->owned_rect[0].x + self->owned_rect[1].x,
+		self->owned_rect[0].y + self->owned_rect[1].y
+	};
+	r.x /= 2;
+	r.y /= 2;
+	for(int i = 0; i < 7;) {
+		char boat_mem[5][5];
+		char (*boat)[5][5] = &boat_mem;
+		memcpy(boat, Pieces[i], sizeof(boat_mem));
+	init:;
+		color_t *arr = stateToView(game, self);
+		int k = 0;
+		int coll = blitBoat(boat, arr, r, game, &k);
+		printColorArray(game, arr);
+		printf("[%s] Flèches pour déplacer, espace pour valider\n\r", self->name);
+
+		int c;
+		switch(c = getch()) {
+		case ' ':
+			if (!coll) {
+				prev = r;
+				++i;
+				blitToGrid(boat, r, game, id++);
+				r = (point_t) {
+					self->owned_rect[0].x + self->owned_rect[1].x,
+					self->owned_rect[0].y + self->owned_rect[1].y
+				};
+				r.x /= 2;
+				r.y /= 2;
+			}
+			else
+				r = prev;
+			break;
+		case 'r':
+			rotate(*boat, 1);
+			goto init;
+			break;
+		case '\033':
+			cursorMovement(&r, game);
+			goto init;
+		case 4:
+			interruptHandler(0);
+			break;
+		}
+		
+		free(arr);
+	}
+
+	self->n_boats = 7;
 }
 
 player_t *newLocalPlayer() {
-  local_player_t *ret = malloc(sizeof(*ret));
-  ret->base.get_action = playerLocalAction;
-  ret->base.setup_boats = playerLocalSetBoats;
-  return &ret->base;
+	local_player_t *ret = calloc(1, sizeof(*ret));
+	ret->base.get_action = playerLocalAction;
+	ret->base.setup_boats = playerLocalSetBoats;
+	return &ret->base;
 }
 
-enum color {BLUE, CYAN, RED, LIGHT_RED, WHITE, BLACK};
+color_t *stateToView(game_state_t *game, player_t *filter) {
+	/* TODO: Ne pas allouer ici pour éviter des allocations inutiles */
+	color_t *arr = calloc(game->width * game->height, sizeof(color_t));
 
-bool in_zone (int pos, game_state_t *user){
-	int userzone_begin = game->width * user->owned_rect[0]->y + user->owned_rect[0]->x
-	int userzone_end = game->width * user->owned_rect[1]->y + user->owned_rect[1]->x
-	if (pos >= userzone_begin && pos <= userzone_end)
-		return TRUE;
-	return FALSE;
+	static const color_t player_colors[] = {CYAN, WHITE, YELLOW, MAGENTA, 0, 0, 0, RED};
+	static const color_t foe_colors[] = {BLUE, BLUE, CYAN, MAGENTA, 0, 0, 0, RED};
+
+	for (int i = 0; i < game->height; ++i)
+		for (int j = 0; j < game->width; ++j) {
+			int state = game->grid[game->width * i + j].state & 0x7;
+			const color_t *values = isPointInsideRect((point_t){j, i}, filter->owned_rect) ?
+				player_colors : foe_colors;
+			arr[game->width * i + j] = values[state];
+		}
+	return arr;
 }
-
-int * tab_color (player_t *user, game_state_t *game){ // return tableau des couleurs du jeu.
-	int lng = game.width * game.height;
-	int grid_color[lng];
-	enum color_enmy = {BLUE, BLUE, CYAN, RED, NO, NO, NO, LIGHT_RED}
-	enum color_ally = {CYAN, WHITE, CYAN, RED, NO, NO, NO, LIGHT_RED}
-	for (int i=0 ; i<lng ; ++i){
-		if (in_zone(i, user) == FALSE)	
-			grid_color[i] = color_enmy[game->grid.state]
-		else
-			grid_color[i] = color_ally[game->grid.state]
-	}
-	return grid_color;
-}
-
-char pieces[][PIECE_SIZE][PIECE_SIZE] = {{{1, 1, 0, 0, 0},
-										  {1, 1, 0, 0, 0},
-										  {0, 0, 0, 0, 0},
-										  {0, 0, 0, 0, 0},
-										  {0, 0, 0, 0, 0}},
-										 {{1, 1, 1, 1, 0},
-										  {1, 1, 1, 1, 0},
-										  {0, 0, 0, 0, 0},
-										  {0, 0, 0, 0, 0},
-										  {0, 0, 0, 0, 0}},
-										 {{1, 1, 0, 0, 0},
-										  {0, 0, 0, 0, 0},
-										  {0, 0, 0, 0, 0},
-										  {0, 0, 0, 0, 0},
-										  {0, 0, 0, 0, 0}},
-										 {{1, 1, 1, 0, 0},
-										  {0, 0, 0, 0, 0},
-										  {0, 0, 0, 0, 0},
-										  {0, 0, 0, 0, 0},
-										  {0, 0, 0, 0, 0}},
-										 {{1, 1, 1, 1, 0},
-										  {0, 0, 0, 0, 0},
-										  {0, 0, 0, 0, 0},
-										  {0, 0, 0, 0, 0},
-										  {0, 0, 0, 0, 0}},
-										 {{1, 1, 1, 1, 1},
-										  {0, 0, 0, 0, 0},
-										  {0, 0, 0, 0, 0},
-										  {0, 0, 0, 0, 0},
-										  {0, 0, 0, 0, 0}},
-										 {{1, 1, 1, 1, 0},
-										  {0, 0, 0, 1, 0},
-										  {0, 0, 0, 1, 0},
-										  {0, 0, 0, 0, 0},
-										  {0, 0, 0, 0, 0}}};
 
 void cyclicRoll(char *a, char *b, char *c, char *d) {
 	char temp = *a;
@@ -154,6 +284,7 @@ void rotate(char piece[5][5], int rotation_nb) {
 
 /* debug */
 void printPiece(char piece[PIECE_SIZE][PIECE_SIZE]) {
+	(void)piece;
 #ifdef Debug
 	int inner_loop, outer_loop;
 	for (outer_loop = 0; outer_loop < PIECE_SIZE; ++outer_loop) {
@@ -163,3 +294,39 @@ void printPiece(char piece[PIECE_SIZE][PIECE_SIZE]) {
 	}
 #endif
 }
+
+char Pieces[][PIECE_SIZE][PIECE_SIZE] = {{{1, 1, 0, 0, 0},
+										  {1, 1, 0, 0, 0},
+										  {0, 0, 0, 0, 0},
+										  {0, 0, 0, 0, 0},
+										  {0, 0, 0, 0, 0}},
+										 {{1, 1, 1, 1, 0},
+										  {1, 1, 1, 1, 0},
+										  {0, 0, 0, 0, 0},
+										  {0, 0, 0, 0, 0},
+										  {0, 0, 0, 0, 0}},
+										 {{1, 1, 0, 0, 0},
+										  {0, 0, 0, 0, 0},
+										  {0, 0, 0, 0, 0},
+										  {0, 0, 0, 0, 0},
+										  {0, 0, 0, 0, 0}},
+										 {{1, 1, 1, 0, 0},
+										  {0, 0, 0, 0, 0},
+										  {0, 0, 0, 0, 0},
+										  {0, 0, 0, 0, 0},
+										  {0, 0, 0, 0, 0}},
+										 {{1, 1, 1, 1, 0},
+										  {0, 0, 0, 0, 0},
+										  {0, 0, 0, 0, 0},
+										  {0, 0, 0, 0, 0},
+										  {0, 0, 0, 0, 0}},
+										 {{1, 1, 1, 1, 1},
+										  {0, 0, 0, 0, 0},
+										  {0, 0, 0, 0, 0},
+										  {0, 0, 0, 0, 0},
+										  {0, 0, 0, 0, 0}},
+										 {{1, 1, 1, 1, 0},
+										  {0, 0, 0, 1, 0},
+										  {0, 0, 0, 1, 0},
+										  {0, 0, 0, 0, 0},
+										  {0, 0, 0, 0, 0}}};

@@ -25,3 +25,4 @@ set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${CC_COVERAGE_COMPILE_FLAG
 include_directories(include)
 file(GLOB SOURCES "src/*")
 add_executable(${TGT} ${SOURCES})
+target_link_libraries(${TGT} ncurses)
