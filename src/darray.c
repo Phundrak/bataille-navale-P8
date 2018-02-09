@@ -30,8 +30,8 @@ darray_t *darrayNew(size_t element_size) {
 }
 
 /**
- * `darrayInsert` insère l’élément `elem` à l’endroit pointé par `pos` dans l’objet \ref darray_t. Cela décalera tous
- * les éléments stockés dans `self` d’un cran vers la fin du tableau et insérera à l’endroit pointé le nouvel élément.
+ * `darrayInsert` insère l’élément `elem` avant l'élément pointé par `pos` dans l’objet \ref darray_t. Cela décalera tous
+ * les éléments stockés dans \a `self` pen d’un cran vers la fin du tableau et insérera à l’endroit pointé le nouvel élément.
  * Cette fonction modifie les membres `begin` et `end` et potentiellement `capacity` de `self`.
  * @param self Objet \ref darray_t dans lequel on souhaite insérer un nouvel élément
  * @param pos Position à laquelle on souhaite insérer un nouvel élément
