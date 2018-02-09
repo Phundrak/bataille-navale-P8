@@ -12,8 +12,8 @@
 #include <string.h>
 
 /**
- * Restaure l'état du terminal et quitte le jeu.
- * @param s Le signal qui a causé l'appel de la fonction, ignoré si appelé manuellement
+ * \brief Restaure l'état du terminal et quitte le jeu.
+ * \param s Le signal qui a causé l'appel de la fonction, ignoré si appelé manuellement
  */
 void interruptHandler(int s) {
 	(void)s;
@@ -28,12 +28,14 @@ void interruptHandler(int s) {
 }
 
 /**
+ * \brief Fonction principale du programme
+ *
  * Point d'entrée du programme. Un argument active le mode rapide, où chaque 
  * joueur ne doit placer qu'un bateau dont l'indice correspond à l'argument
  * 
- * @param argc Le nombre d'arguments passé au programme.
- * @param argv Un tableau de taille argc terminé par un pointeur nul correspondant aux arguments sous forme de chaine passé au programme.
- * @return L'état de sortie du programme
+ * \param argc Le nombre d'arguments passé au programme.
+ * \param argv Un tableau de taille argc terminé par un pointeur nul correspondant aux arguments sous forme de chaine passé au programme.
+ * \return L'état de sortie du programme
  */
 int main(int argc, char *argv[argc])
 {

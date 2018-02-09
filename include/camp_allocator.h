@@ -15,13 +15,10 @@ typedef struct player_s player_t;
  * et d'équipe aux joueurs
  */
 typedef struct camp_allocator_s {
-	void (*put_in_camp)(struct camp_allocator_s *, game_state_t *, player_t *); ///< Pointeur vers une fonction qui gère l'allocation, voir \ref `singleAllocateCamp`
+	void (*put_in_camp)(struct camp_allocator_s *, game_state_t *, player_t *); /*!< Pointeur vers une fonction qui gère l'allocation, voir \ref singleAllocateCamp */
 } camp_allocator_t;
 
-/**
- * \brief renvoie un allocateur qui place tout les joueurs dans la 
- * même équipe et leur affecte une zone de 17 * 17
- */
+/// \brief Renvoie un allocateur qui place tout les joueurs dans la même équipe et leur affecte une zone de 17 * 17
 camp_allocator_t *newSingleAllocator();
 
 #endif /* CAMP_ALLOCATOR_H */

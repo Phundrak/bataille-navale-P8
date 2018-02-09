@@ -10,7 +10,7 @@
 
 /**
  * \struct single_camp_allocator_t
- * \brief Objet héritant de \ref `camp_allocator_t`.
+ * \brief Objet héritant de \ref camp_allocator_t.
  * Encapsule la logique d'un jeu en mode "Chacun pour soi" ou chaque joueur est seul
  * dans son équipe.
  */
@@ -23,9 +23,9 @@ typedef struct {
  * `singleAllocateCamp` affecte à un joueur une zone de la grille de jeu
  * de taille 17 * 17 et le place seul dans une équipe. Le joueur doit ensuite placer
  * ses bateaux dans la zone qui lui est alloué
- * @param base Pointeur vers l'instance parente
- * @param game Pointeur vers l'état de jeu
- * @param player Pointeur vers le joueur à placer
+ * \param base Pointeur vers l'instance parente
+ * \param game Pointeur vers l'état de jeu
+ * \param player Pointeur vers le joueur à placer
  */
 static void singleAllocateCamp(camp_allocator_t *base, game_state_t *game, player_t *p) {
 	single_camp_allocator_t *self = (void*) base;
@@ -54,7 +54,7 @@ static void singleAllocateCamp(camp_allocator_t *base, game_state_t *game, playe
  * `newSingleAllocator` permet de créer un nouvel objet de type \ref camp_allocator_t
  * qui encapsule la logique d'un jeu en mode "Chacun pour soi" où chaque joueur est seul
  * dans son équipe.
- * @return Pointeur sur le nouvel objet \ref camp_allocator_t
+ * \return Pointeur sur le nouvel objet \ref camp_allocator_t
  */
 camp_allocator_t *newSingleAllocator() {
 	single_camp_allocator_t *ret = calloc(1, sizeof(*ret));

@@ -11,7 +11,7 @@
 /**
  * `newCamp` permet de créer un nouvel objet de type \ref camp_t ne contenant 
  * aucun joueur.
- * @return Pointeur sur le nouvel objet \ref camp_t
+ * \return Pointeur sur le nouvel objet \ref camp_t
  */
 camp_t *newCamp() {
 	camp_t *ret = calloc(1, sizeof(*ret));
@@ -24,8 +24,8 @@ camp_t *newCamp() {
  * `campTeamString` renvoie une représentation sous forme de chaine
  * de caractères des membres de l'équipe. Cette fonction ne doit être
  * une seule fois après la constitution finale de l'équipe, et la mémoire
- * de la chaine est libéré lors de l'appel à \ref `deleteCamp`.
- * @param self Pointeur vers le camp
+ * de la chaine est libéré lors de l'appel à \ref deleteCamp.
+ * \param self Pointeur vers le camp
  */
 char *campTeamString(camp_t *self) {
 	unsigned n = darraySize(self->players);
@@ -46,7 +46,7 @@ char *campTeamString(camp_t *self) {
 
 /**
  * `deleteCamp` libère les ressources associées à une équipe
- * @param self Pointeur vers le camp
+ * \param self Pointeur vers le camp
  */
 void deleteCamp(camp_t *self) {
 	for (unsigned j = 0; j < darraySize(self->players); ++j) {

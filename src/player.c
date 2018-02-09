@@ -26,8 +26,8 @@ extern char Pieces[][PIECE_SIZE][PIECE_SIZE];
 /**
  * `printColorArray` nettoie le terminal et affiche un tableau
  * de couleur représentant un état possible du jeu
- * @param game L'état du jeu
- * @param arr Tableau de couleurs
+ * \param game L'état du jeu
+ * \param arr Tableau de couleurs
  */
 void printColorArray(game_state_t *game, color_t *arr) {
 	// Partant du principe que chaque case a une couleur différente (pire cas)
@@ -60,10 +60,10 @@ void printColorArray(game_state_t *game, color_t *arr) {
 /**
  * `blitToGrid` écrit le bitmap `piece` d'un bateau d'identifiant `id`
  * aux coordonnées `pos` dans la grille de jeu `game`
- * @param piece la pièce à placer
- * @param pos les coordonnées d'où placer la pièce
- * @param game L'état du jeu
- * @param id L'id du bateau qui sera placé
+ * \param piece la pièce à placer
+ * \param pos les coordonnées d'où placer la pièce
+ * \param game L'état du jeu
+ * \param id L'id du bateau qui sera placé
  */
 void blitToGrid(char (*piece)[5][5], point_t pos, game_state_t *game, int id) {
 	for (int i = 0; i < 5; ++i)
@@ -86,12 +86,12 @@ void blitToGrid(char (*piece)[5][5], point_t pos, game_state_t *game, int id) {
 /**
  * `blitBoat` écrit le bitmap `piece` d'un bateau aux coordonnées `pos` dans la
  * un tableau de couleur `arr` pouvant représenter un état du jeu `game`
- * @param piece la pièce à placer
- * @param arr le tableau où dessiner la pièce
- * @param pos les coordonnées d'où placer la pièce
- * @param game L'état du jeu
- * @param add pointeur vers le nombre de fragments du bateau qui ont pu être placés
- * @return le nombre de fragments du bateau sont superposé avec des éléments où un frament ne 
+ * \param piece la pièce à placer
+ * \param arr le tableau où dessiner la pièce
+ * \param pos les coordonnées d'où placer la pièce
+ * \param game L'état du jeu
+ * \param add pointeur vers le nombre de fragments du bateau qui ont pu être placés
+ * \return le nombre de fragments du bateau sont superposé avec des éléments où un frament ne 
  * peut pas être placé. Utilisé pour la gestion de collision.
  */
 int blitBoat(char (*piece)[5][5], color_t *arr, point_t pos, game_state_t *game, int *add) {
@@ -120,8 +120,8 @@ int blitBoat(char (*piece)[5][5], color_t *arr, point_t pos, game_state_t *game,
 /**
  * `cursorMovement` gère une itération du mouvement d'un curseur aux 
  * coordonnées pointées par `r` dans un état du jeu `game`
- * @param r pointeur vers les coordonnées du curseur
- * @param game L'état du jeu
+ * \param r pointeur vers les coordonnées du curseur
+ * \param game L'état du jeu
  */
 static void cursorMovement(point_t *r, game_state_t *game) {
 	switch(getch()) {
@@ -152,8 +152,8 @@ static void cursorMovement(point_t *r, game_state_t *game) {
 
 /**
  * `playerLocalAction` gère un tour d'un joueur local dans le jeu `game`
- * @param self Pointeur vers l'instance parente du joueur
- * @param game L'état du jeu
+ * \param self Pointeur vers l'instance parente du joueur
+ * \param game L'état du jeu
  */
 static point_t playerLocalAction(player_t *self, game_state_t *game) {
 	point_t r = {game->width / 2, game->height / 2};
@@ -184,8 +184,8 @@ static point_t playerLocalAction(player_t *self, game_state_t *game) {
 
 /**
  * `playerLocalSetBoats` gère le placement des bateaux d'un joueur local dans le jeu `game`
- * @param self Pointeur vers l'instance parente du joueur
- * @param game L'état du jeu
+ * \param self Pointeur vers l'instance parente du joueur
+ * \param game L'état du jeu
  */
 static void playerLocalSetBoats(player_t *self, game_state_t *game) {
 	point_t prev = {0, 0};
@@ -240,7 +240,7 @@ static void playerLocalSetBoats(player_t *self, game_state_t *game) {
 
 /**
  * `newLocalPlayer` crée une instance d'un joueur local sur terminal
- * @return Pointeur vers la nouvelle instance
+ * \return Pointeur vers la nouvelle instance
  */
 player_t *newLocalPlayer() {
 	local_player_t *ret = calloc(1, sizeof(*ret));
@@ -252,9 +252,9 @@ player_t *newLocalPlayer() {
 /**
  * `stateToView` crée un tableau de couleur de même dimension que la grille de 
  * jeu représentant le bitmap de l'état du jeu `game` du point de vue du joueur `filter`
- * @param game L'état du jeu
- * @param filter Le joueur selon le point de vue duquel on génère la vue
- * @return Tableau de couleur représentant le bitmap de l'état du jeu
+ * \param game L'état du jeu
+ * \param filter Le joueur selon le point de vue duquel on génère la vue
+ * \return Tableau de couleur représentant le bitmap de l'état du jeu
  */
 color_t *stateToView(game_state_t *game, player_t *filter) {
 	/* TODO: Ne pas allouer ici pour éviter des allocations inutiles */
@@ -275,11 +275,11 @@ color_t *stateToView(game_state_t *game, player_t *filter) {
 
 /**
  * `cyclicRoll` fait une rotation dans un sens des quatres caractères pointés par a, b, c, et d.
- * @param a Un pointeur vers un caractère.
- * @param b Un pointeur vers un caractère.
- * @param c Un pointeur vers un caractère.
- * @param d Un pointeur vers un caractère.
- * @return Tableau de couleur représentant le bitmap de l'état du jeu
+ * \param a Un pointeur vers un caractère.
+ * \param b Un pointeur vers un caractère.
+ * \param c Un pointeur vers un caractère.
+ * \param d Un pointeur vers un caractère.
+ * \return Tableau de couleur représentant le bitmap de l'état du jeu
  */
 void cyclicRoll(char *a, char *b, char *c, char *d) {
 	char temp = *a;
@@ -291,9 +291,9 @@ void cyclicRoll(char *a, char *b, char *c, char *d) {
 
 /**
  * `emptyLine` détermine si la ligne `line` est vide.
- * @param piece Pièce à vérifier.
- * @param line Indice de la ligne à vérifier.
- * @return 0 si la ligne contient au moins un élément, ou 1 dans le cas contraire
+ * \param piece Pièce à vérifier.
+ * \param line Indice de la ligne à vérifier.
+ * \return 0 si la ligne contient au moins un élément, ou 1 dans le cas contraire
  */
 int emptyLine(char piece[PIECE_SIZE][PIECE_SIZE], int line) {
 	int loop;
@@ -305,9 +305,9 @@ int emptyLine(char piece[PIECE_SIZE][PIECE_SIZE], int line) {
 
 /**
  * `emptyColumn` détermine si la colonne `column` est vide.
- * @param piece Pièce à vérifier.
- * @param column Indice de la ligne à vérifier.
- * @return 0 si la colonne contient au moins un élément, ou 1 dans le cas contraire
+ * \param piece Pièce à vérifier.
+ * \param column Indice de la ligne à vérifier.
+ * \return 0 si la colonne contient au moins un élément, ou 1 dans le cas contraire
  */
 int emptyColumn(char piece[PIECE_SIZE][PIECE_SIZE], int column) {
 	int loop;
@@ -319,7 +319,7 @@ int emptyColumn(char piece[PIECE_SIZE][PIECE_SIZE], int column) {
 
 /**
  * `shiftColumnLeft` déplace tout les éléments d'une pièce d'une colonne vers la gauche.
- * @param piece Pièce à modifier.
+ * \param piece Pièce à modifier.
  */
 void shiftColumnLeft(char piece[PIECE_SIZE][PIECE_SIZE]) {
 	int column;
@@ -331,7 +331,7 @@ void shiftColumnLeft(char piece[PIECE_SIZE][PIECE_SIZE]) {
 
 /**
  * `shiftLineUp` déplace tout les éléments d'une pièce d'une ligne vers le haut.
- * @param piece Pièce à modifier.
+ * \param piece Pièce à modifier.
  */
 void shiftLineUp(char piece[PIECE_SIZE][PIECE_SIZE]) {
 	memmove(&piece[0][0], &piece[1][0], sizeof(piece[0]) * (PIECE_SIZE - 1));
@@ -340,7 +340,7 @@ void shiftLineUp(char piece[PIECE_SIZE][PIECE_SIZE]) {
 
 /**
  * `realignPiece` élimine les lignes et colonnes vides d'une pièces
- * @param piece Pièce à modifier.
+ * \param piece Pièce à modifier.
  */
 void realignPiece(char piece[PIECE_SIZE][PIECE_SIZE]) {
 	while (emptyColumn(piece, 0))
@@ -350,9 +350,9 @@ void realignPiece(char piece[PIECE_SIZE][PIECE_SIZE]) {
 }
 
 /**
- * `rotate` effectue un certain nombre de rotation d'une pièce
- * @param piece Pièce à modifier.
- * @param rotation_nb nombre de rotations à effectuer.
+ * `rotate` effectue un certain nombre de rotation à 90° d'une pièce dans le sens horaire
+ * \param piece Pièce à modifier.
+ * \param rotation_nb Nombre de rotations à effectuer.
  */
 void rotate(char piece[5][5], int rotation_nb) {
 	int outer_loop, inner_loop, rotations;
@@ -370,7 +370,7 @@ void rotate(char piece[5][5], int rotation_nb) {
 
 /**
  * `printPiece` affiche une pièce si le mode de construction est Debug
- * @param piece Pièce à afficer.
+ * \param piece Pièce à afficer.
  */
 void printPiece(char piece[PIECE_SIZE][PIECE_SIZE]) {
 	(void)piece;

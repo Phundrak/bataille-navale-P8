@@ -11,8 +11,8 @@
  * \brief Défini un point dans un espace 2D
  */
 typedef struct {
-	int x; ///< Coordonnées X du point
-	int y; ///< Coordonnées Y du point
+	int x; /*!< Coordonnées X du point */
+	int y; /*!< Coordonnées Y du point */
 } point_t;
 
 #endif /* POINT_H */
