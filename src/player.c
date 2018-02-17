@@ -30,31 +30,27 @@ extern char Pieces[][PIECE_SIZE][PIECE_SIZE];
  * \param arr Tableau de couleurs
  */
 void printColorArray(game_state_t *game, color_t *arr) {
-	// Partant du principe que chaque case a une couleur différente (pire cas)
-	// chaque case cause l'émission de deux espace + de 5 caracteres de controle
-	// chaque fin de ligne cause 6 caracteres
-	// 4 caracteres sont utilisé au début pour nettoyer l'écran et
-	// 5 pour restaurer la couleur de fond par défaut
-	char *buf = malloc(game->height * game->width * sizeof(char) * 7 + (game->height * 7) + 9);
-	buf[0] = 0;
-	char *it = buf;
-	it += sprintf(it, "\033[2J\033[0;0f");
+	clear();
+	refresh();
 	color_t current = BLACK;
+	attron(COLOR_PAIR(current));
 	for (int i = 0; i < game->height; ++i) {
 		for (int j = 0; j < game->width; ++j) {
+			move(i, j * 2);
 			color_t c = arr[game->width * i + j];
 			if (c != current) {
-				it += sprintf(it, "\033[%dm", c);
+				attroff(COLOR_PAIR(current));
 				current = c;
 			}
-			it += sprintf(it, "  ");
+			attron(COLOR_PAIR(c));
+			printw("  ");
+			current = c;
 		}
-		current = BLACK;
-		it += sprintf(it, "\033[0m\n\r");
+		attron(COLOR_PAIR(BLACK));
 	}
-	it += sprintf(it, "\033[0m");
-	puts(buf);
-	free(buf);
+	move(game->height + 1, 0);
+	attroff(COLOR_PAIR(BLACK));
+	refresh();
 }
 
 /**
@@ -161,7 +157,7 @@ static point_t playerLocalAction(player_t *self, game_state_t *game) {
 		color_t *arr = stateToView(game, self);
 		arr[game->width * r.y + r.x] = BLACK;
 		printColorArray(game, arr);
-		printf("Tour du joueur %s\n\r", self->name);
+		printw("Tour du joueur %s\n\r", self->name);
 		refresh();
 		free(arr);
 		while (1) {
@@ -204,7 +200,7 @@ static void playerLocalSetBoats(player_t *self, game_state_t *game) {
 			int k = 0;
 			int coll = blitBoat(boat, arr, r, game, &k);
 			printColorArray(game, arr);
-			printf("[%s] Flèches pour déplacer, r pour tourner, espace pour valider\n\r", self->name);
+			printw("[%s] Fleches pour deplacer, r pour tourner, espace pour valider\n\r", self->name);
 			// C'était soit switch et goto, soit une série de if-else
 			int c = getch();
 			if (c == ' ') {

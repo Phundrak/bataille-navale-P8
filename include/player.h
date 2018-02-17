@@ -21,9 +21,9 @@ typedef struct game_state_s game_state_t;
 typedef struct player_s {
 	point_t (*get_action)(struct player_s *, game_state_t *);	/*!< Pointeur vers une fonction qui détermine la décision d'un joueur */
 	void (*setup_boats)(struct player_s *, game_state_t *);		/*!< Pointeur vers une fonction qui place les bateaux du joueur sur sa zone allouée */
-	char *name;																								/*!< Nom du joueur */
-	point_t owned_rect[2];																		/*!< Zone de la grille de jeu allouée au joueur */
-	int n_boats;																							/*!< Nombre de bateaux restant pour ce joueur */
+	char *name;													/*!< Nom du joueur */
+	point_t owned_rect[2];										/*!< Zone de la grille de jeu allouée au joueur */
+	int n_boats;												/*!< Nombre de bateaux restant pour ce joueur */
 } player_t;
 
 /// \brief Instancie un joueur local
@@ -34,8 +34,8 @@ player_t *newLocalPlayer();
  * \brief Couleur affichable dans un terminal
  */
 typedef enum {
-	BLACK,
-	RED = 41,
+	BLACK = 1,
+	RED,
 	GREEN,
 	YELLOW,
 	BLUE,
