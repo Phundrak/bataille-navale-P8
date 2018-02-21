@@ -6,7 +6,6 @@
 #include <camp.h>
 #include <camp_allocator.h>
 #include <game_state.h>
-#include <stdlib.h>
 
 /**
  * \struct single_camp_allocator_t

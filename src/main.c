@@ -6,7 +6,6 @@
 #include <signal.h>
 #include <darray.h>
 #include <game_state.h>
-#include <player.h>
 #include <stdio.h>
 #include <curses.h>
 #include <string.h>
@@ -66,7 +65,7 @@ int main(int argc, char *argv[argc])
 	game_state_t *game = newGame();
 
 	if (argc >= 2) {
-		game->cheat = atoi(argv[1]);
+		game->cheat = atoi(argv[1]); // NOLINT
 		if (game->cheat < 0 || game->cheat >= 7)
 			game->cheat = -1;
 	}
@@ -85,14 +84,14 @@ int main(int argc, char *argv[argc])
 		for(unsigned i = 0; i < darraySize(game->camps); ++i) {
 			camp_t *camp = *(camp_t **)darrayGet(game->camps, i);
 			player_t *players = *(player_t**)darrayGet(camp->players, 0);
-			unsigned n = darraySize(camp->players);
+			size_t n = darraySize(camp->players);
 			while (n--) {
 				if (players->n_boats == 0) {
 					++players;
 					continue;
 				}
-				result_t r = REDO;
 				point_t coordinates;
+				result_t r;
 				do {
 					coordinates = players->get_action(players, game);
 					r = doAction(game, players, coordinates);

@@ -4,7 +4,6 @@
  */
 
 #include <camp.h>
-#include <darray.h>
 #include <string.h>
 #include <stdio.h>
 
@@ -28,9 +27,9 @@ camp_t *newCamp() {
  * \param self Pointeur vers le camp
  */
 char *campTeamString(camp_t *self) {
-	unsigned n = darraySize(self->players);
+	size_t n = darraySize(self->players);
 	player_t *players = *(player_t **)darrayGet(self->players, 0);
-	int len = 0;
+	size_t len = 0;
 	for (unsigned i = 0; i < n; ++i) {
 		len += players[i].name ? strlen(players[i].name) : 0;
 	}

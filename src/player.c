@@ -4,14 +4,10 @@
  */
 
 #include <player.h>
-#include <stdlib.h>
 #include <game_state.h>
 #include <unistd.h>
 #include <curses.h>
 #include <string.h>
-#ifdef Debug
-#include <stdio.h>
-#endif
 
 /**
  * \struct local_player_t
@@ -29,18 +25,18 @@ extern char Pieces[][PIECE_SIZE][PIECE_SIZE];
  * \param game L'état du jeu
  * \param arr Tableau de couleurs
  */
-void printColorArray(game_state_t *game, color_t *arr) {
+void printColorArray(game_state_t *game, const color_t *arr) {
 	clear();
 	refresh();
 	color_t current = BLACK;
 	attron(COLOR_PAIR(current));
-	for (int i = 0; i < game->height; ++i) {
-		for (int j = 0; j < game->width; ++j) {
+	for (int i = 0; i < (int)game->height; ++i) {
+		for (int j = 0; j < (int)game->width; ++j) {
 			move(i, j * 2);
 			color_t c = arr[game->width * i + j];
 			if (c != current) {
 				attroff(COLOR_PAIR(current));
-				current = c;
+				// current = c;
 			}
 			attron(COLOR_PAIR(c));
 			printw("  ");
@@ -48,7 +44,7 @@ void printColorArray(game_state_t *game, color_t *arr) {
 		}
 		attron(COLOR_PAIR(BLACK));
 	}
-	move(game->height + 1, 0);
+	move((int)game->height + 1, 0);
 	attroff(COLOR_PAIR(BLACK));
 	refresh();
 }
@@ -61,7 +57,7 @@ void printColorArray(game_state_t *game, color_t *arr) {
  * \param game L'état du jeu
  * \param id L'id du bateau qui sera placé
  */
-void blitToGrid(char (*piece)[5][5], point_t pos, game_state_t *game, int id) {
+void blitToGrid(char (*piece)[5][5], point_t pos, game_state_t *game, unsigned char id) {
 	for (int i = 0; i < 5; ++i)
 		for (int j = 0; j < 5; ++j) {
 			char v = (*piece)[i][j];
@@ -143,6 +139,7 @@ static void cursorMovement(point_t *r, game_state_t *game) {
 			break;
 		}
 		break;
+		default:break;
 	}
 }
 
@@ -256,14 +253,14 @@ color_t *stateToView(game_state_t *game, player_t *filter) {
 	/* TODO: Ne pas allouer ici pour éviter des allocations inutiles */
 	color_t *arr = calloc(game->width * game->height, sizeof(color_t));
 
-	static const color_t player_colors[] = {CYAN, WHITE, YELLOW, MAGENTA, 0, 0, 0, RED};
-	static const color_t foe_colors[] = {BLUE, BLUE, CYAN, MAGENTA, 0, 0, 0, RED};
+	static const color_t player_colors[] = {CYAN, WHITE, YELLOW, MAGENTA, BLACK, BLACK, BLACK, RED};
+	static const color_t foe_colors[] = {BLUE, BLUE, CYAN, MAGENTA, BLACK, BLACK, BLACK, RED};
 
-	for (int i = 0; i < game->height; ++i)
-		for (int j = 0; j < game->width; ++j) {
+	for (size_t i = 0; i < game->height; ++i)
+		for (size_t j = 0; j < game->width; ++j) {
 			int state = game->grid[game->width * i + j].state & 0x7;
 			const color_t *values = isPointInsideRect((point_t){j, i}, filter->owned_rect) ?
-				player_colors : foe_colors;
+															(const color_t*)player_colors : foe_colors;
 			arr[game->width * i + j] = values[state];
 		}
 	return arr;
@@ -362,22 +359,6 @@ void rotate(char piece[5][5], int rotation_nb) {
 						&piece[inner_loop][PIECE_SIZE - 1 - outer_loop]);
 	}
 	realignPiece(piece);
-}
-
-/**
- * `printPiece` affiche une pièce si le mode de construction est Debug
- * \param piece Pièce à afficer.
- */
-void printPiece(char piece[PIECE_SIZE][PIECE_SIZE]) {
-	(void)piece;
-#ifdef Debug
-	int inner_loop, outer_loop;
-	for (outer_loop = 0; outer_loop < PIECE_SIZE; ++outer_loop) {
-		for (inner_loop = 0; inner_loop < PIECE_SIZE; ++inner_loop)
-			printf("%d ", piece[outer_loop][inner_loop]);
-		printf("\n");
-	}
-#endif
 }
 
 /// \brief Tableau des pièces représentant un type de bateau

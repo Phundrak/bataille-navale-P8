@@ -5,8 +5,6 @@
 
 #include <cell.h>
 #include <game_state.h>
-#include <point.h>
-#include <stdlib.h>
 
 /* TODO:
 	 Ajouter la possibilité de passer des options, notamment
@@ -24,7 +22,7 @@ game_state_t *newGame(/*Options*/) {
 
 	ret->width = 17 * 2;
 	ret->height = 17;
-	ret->grid = calloc(sizeof(cell_t), (size_t)(ret->width * ret->height));
+	ret->grid = calloc(sizeof(cell_t), ret->width * ret->height);
 	ret->camps = darrayNew(sizeof(camp_t *));
 	ret->cheat = -1;
 
@@ -213,7 +211,7 @@ cell_t *getCell(game_state_t *game, point_t co) {
  * \return Les coordonnées de la cellule pointée par `c`
  */
 point_t getCoordinates(game_state_t *game, cell_t *c) {
-	int dist = c - game->grid;
+	unsigned long dist = c - game->grid;
 	return (point_t) {
 		dist % game->width,
 		dist / game->width

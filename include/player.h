@@ -36,8 +36,7 @@ player_t *newLocalPlayer();
 typedef enum {
 	BLACK = 1,
 	RED,
-	GREEN,
-	YELLOW,
+	YELLOW = RED + 2,
 	BLUE,
 	MAGENTA,
 	CYAN,
@@ -48,12 +47,9 @@ typedef enum {
 color_t *stateToView(game_state_t *game, player_t *filter);
 
 /// \brief Affiche un tableau de couleur associé à un jeu
-void printColorArray(game_state_t *game, color_t *arr);
+void printColorArray(game_state_t *game, const color_t *arr);
 
 /// \brief Fait tourner une pièce 90° dans le sens des aiguilles d'une montre `rotation_nb` fois.
 void rotate(char piece[5][5], int rotation_nb);
-
-/// \brief Affiche une pièce `piece` si compilation en mode debug
-void printPiece(char piece[PIECE_SIZE][PIECE_SIZE]);
 
 #endif /* PLAYER_H */

@@ -5,10 +5,7 @@
 
 #include <darray.h>
 #include <string.h>
-#include <stdlib.h>
 #include <stdio.h>
-
-#define _GNU_SOURCE
 
 /// Constante pour les erreurs liées à \ref darray_t
 #define PTR_ERROR 2
@@ -41,7 +38,7 @@ darray_t *darrayNew(size_t element_size) {
 void darrayInsert(darray_t *self, void *pos, void *elem) {
 	void *new_array;
 	char *itr;
-	int pos_aux;
+	unsigned long pos_aux;
 	size_t size;
 	pos_aux = (char*)pos - (char*)self->begin;
 	if(darraySize(self) >= self->capacity) {
@@ -58,7 +55,7 @@ void darrayInsert(darray_t *self, void *pos, void *elem) {
 	}
 
 	itr = (char*)self->begin + pos_aux;
-	memmove(itr + self->element_size, itr, (char*)self->end - (char*)itr);
+	memmove(itr + self->element_size, itr, (char*)self->end - itr);
 	memcpy(itr, elem, self->element_size);
 	self->end = (char*)self->end + self->element_size;
 }
