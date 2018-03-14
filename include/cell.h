@@ -10,7 +10,7 @@
  * \struct cell_t
  * \brief Représente l'état d'une cellule
  */
-typedef struct {
+typedef struct cell_s {
 	union {
 		struct {
 			int has_boat : 1;		/*!< 1 si la cellule contient un fragment de bateau */

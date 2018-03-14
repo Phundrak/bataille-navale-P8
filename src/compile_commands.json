@@ -1,0 +1,42 @@
+[
+{
+  "directory": "/home/lillie/phunbata/build",
+  "command": "/usr/bin/cc  -I/home/lillie/phunbata/include  -pedantic -Wall -Wextra -Werror -DDebug -g -pg   -o CMakeFiles/bataille_navale.dir/src/camp.c.o   -c /home/lillie/phunbata/src/camp.c",
+  "file": "/home/lillie/phunbata/src/camp.c"
+},
+{
+  "directory": "/home/lillie/phunbata/build",
+  "command": "/usr/bin/cc  -I/home/lillie/phunbata/include  -pedantic -Wall -Wextra -Werror -DDebug -g -pg   -o CMakeFiles/bataille_navale.dir/src/camp_allocator.c.o   -c /home/lillie/phunbata/src/camp_allocator.c",
+  "file": "/home/lillie/phunbata/src/camp_allocator.c"
+},
+{
+  "directory": "/home/lillie/phunbata/build",
+  "command": "/usr/bin/cc  -I/home/lillie/phunbata/include  -pedantic -Wall -Wextra -Werror -DDebug -g -pg   -o CMakeFiles/bataille_navale.dir/src/darray.c.o   -c /home/lillie/phunbata/src/darray.c",
+  "file": "/home/lillie/phunbata/src/darray.c"
+},
+{
+  "directory": "/home/lillie/phunbata/build",
+  "command": "/usr/bin/cc  -I/home/lillie/phunbata/include  -pedantic -Wall -Wextra -Werror -DDebug -g -pg   -o CMakeFiles/bataille_navale.dir/src/game_logic.c.o   -c /home/lillie/phunbata/src/game_logic.c",
+  "file": "/home/lillie/phunbata/src/game_logic.c"
+},
+{
+  "directory": "/home/lillie/phunbata/build",
+  "command": "/usr/bin/cc  -I/home/lillie/phunbata/include  -pedantic -Wall -Wextra -Werror -DDebug -g -pg   -o CMakeFiles/bataille_navale.dir/src/main.c.o   -c /home/lillie/phunbata/src/main.c",
+  "file": "/home/lillie/phunbata/src/main.c"
+},
+{
+  "directory": "/home/lillie/phunbata/build",
+  "command": "/usr/bin/cc  -I/home/lillie/phunbata/include  -pedantic -Wall -Wextra -Werror -DDebug -g -pg   -o CMakeFiles/bataille_navale.dir/src/player.c.o   -c /home/lillie/phunbata/src/player.c",
+  "file": "/home/lillie/phunbata/src/player.c"
+},
+{
+  "directory": "/home/lillie/phunbata/build",
+  "command": "/usr/bin/cc  -I/home/lillie/phunbata/include  -pedantic -Wall -Wextra -Werror -DDebug -g -pg   -o CMakeFiles/test_bataille_navale.dir/test/bataille.c.o   -c /home/lillie/phunbata/test/bataille.c",
+  "file": "/home/lillie/phunbata/test/bataille.c"
+},
+{
+  "directory": "/home/lillie/phunbata/build",
+  "command": "/usr/bin/cc  -I/home/lillie/phunbata/include  -pedantic -Wall -Wextra -Werror -DDebug -g -pg   -o CMakeFiles/test_bataille_navale.dir/test/test.c.o   -c /home/lillie/phunbata/test/test.c",
+  "file": "/home/lillie/phunbata/test/test.c"
+}
+]

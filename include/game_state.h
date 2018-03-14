@@ -5,11 +5,15 @@
 #ifndef GAME_STATE_H
 #define GAME_STATE_H
 
-#include "cell.h"
+#include <stdlib.h>
 #include "result.h"
-#include "camp.h"
-#include "darray.h"
-#include "camp_allocator.h"
+#include "point.h"
+
+typedef struct cell_s cell_t;
+typedef struct camp_s camp_t;
+typedef struct darray_s darray_t;
+typedef struct player_s player_t;
+typedef struct camp_allocator_s camp_allocator_t;
 
 /**
  * \struct game_state_t
@@ -23,9 +27,7 @@ typedef struct game_state_s {
 	size_t width;							/*!< Largeur de la grille */
 	size_t height;							/*!< Hauteur de la grille */
 	int cheat;							/*!< Indique si le mode rapide est activé. Correspond à l'id d'un seul bateau à placer si non négatif */
-	unsigned char alloc_id;						/*!< L'ID du dernier bateau placé, utilisé pour donner un ID unique à tout les
- * bateaux du
- * plateau */
+	unsigned char alloc_id;						/*!< L'ID du dernier bateau placé, utilisé pour donner un ID unique à tout les bateaux du plateau */
 	camp_allocator_t *camp_allocator;	/*!< Pointeur vers un objet qui décrit la logique d'allocation des équipes et partition de la grille */
 	darray_t *camps;					/*!< Tableau des équipes du jeu */
 	camp_t *winning;					/*!< Pointe vers une équipe vivante, garantie d'être l'équipe victorieuse en fin de partie */

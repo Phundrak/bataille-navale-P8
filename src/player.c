@@ -3,8 +3,10 @@
  * \brief Implémentation des fonctions pour la famille de type \ref player_t
  */
 
+#include <cell.h>
 #include <player.h>
 #include <game_state.h>
+
 #include <unistd.h>
 #include <curses.h>
 #include <string.h>
@@ -83,7 +85,7 @@ void blitToGrid(char (*piece)[5][5], point_t pos, game_state_t *game, unsigned c
  * \param pos les coordonnées d'où placer la pièce
  * \param game L'état du jeu
  * \param add pointeur vers le nombre de fragments du bateau qui ont pu être placés
- * \return le nombre de fragments du bateau sont superposé avec des éléments où un frament ne 
+ * \return le nombre de fragments du bateau sont superposé avec des éléments où un frament ne
  * peut pas être placé. Utilisé pour la gestion de collision.
  */
 int blitBoat(char (*piece)[5][5], color_t *arr, point_t pos, game_state_t *game, int *add) {
@@ -110,7 +112,7 @@ int blitBoat(char (*piece)[5][5], color_t *arr, point_t pos, game_state_t *game,
 }
 
 /**
- * `cursorMovement` gère une itération du mouvement d'un curseur aux 
+ * `cursorMovement` gère une itération du mouvement d'un curseur aux
  * coordonnées pointées par `r` dans un état du jeu `game`
  * \param r pointeur vers les coordonnées du curseur
  * \param game L'état du jeu
@@ -217,11 +219,11 @@ static void playerLocalSetBoats(player_t *self, game_state_t *game) {
 				free(arr);
 				break;
 			}
-			else if (c == 'r') 
+			else if (c == 'r')
 				rotate(*boat, 1);
-			else if (c == '\033') 
+			else if (c == '\033')
 				cursorMovement(&r, game);
-			else if (c == 4) 
+			else if (c == 4)
 				interruptHandler(0);
 			free(arr);
 		}
@@ -243,7 +245,7 @@ player_t *newLocalPlayer() {
 }
 
 /**
- * `stateToView` crée un tableau de couleur de même dimension que la grille de 
+ * `stateToView` crée un tableau de couleur de même dimension que la grille de
  * jeu représentant le bitmap de l'état du jeu `game` du point de vue du joueur `filter`
  * \param game L'état du jeu
  * \param filter Le joueur selon le point de vue duquel on génère la vue

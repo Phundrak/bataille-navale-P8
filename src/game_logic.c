@@ -5,6 +5,10 @@
 
 #include <cell.h>
 #include <game_state.h>
+#include <darray.h>
+#include <camp.h>
+#include <camp_allocator.h>
+#include <player.h>
 
 /* TODO:
 	 Ajouter la possibilité de passer des options, notamment
@@ -32,7 +36,7 @@ game_state_t *newGame(/*Options*/) {
 }
 
 /**
- * `isSunk` teste si le bateau d'identifiant `id` est coulé en observant à 
+ * `isSunk` teste si le bateau d'identifiant `id` est coulé en observant à
  * partir des coordonnées `cp` dans la grille du jeu `game`.
  * \param game Le jeu \ref game_state_t dans lequel se situe le test à faire
  * \param cp Les coordonnées \ref point_t à partie desquelles commencer le test
@@ -77,7 +81,7 @@ int isSunk(game_state_t *game, point_t cp, int id) {
 }
 
 /**
- * `setSunk` marque le bateau d'identifiant `id` comme coulé en observant à 
+ * `setSunk` marque le bateau d'identifiant `id` comme coulé en observant à
  * partir des coordonnées `cp` dans la grille du jeu `game`.
  * \param game Le jeu \ref game_state_t dans lequel se situe le marquage à faire
  * \param cp Les coordonnées \ref point_t à partie desquelles commencer le marquage
@@ -113,7 +117,7 @@ void setSunk(game_state_t *game, point_t cp, int id) {
 }
 
 /**
- * `findOwner` renvoie un pointeur vers un objet de type \ref player_t 
+ * `findOwner` renvoie un pointeur vers un objet de type \ref player_t
  * correspondant au joueur à qui appartient la case aux coordonnées `p`, pour un jeu `game`
  * \param game Le jeu \ref game_state_t dans lequel se situe la recherche à faire
  * \param p Les coordonnées \ref point_t pour lequel on cherche le propriétaire
@@ -165,7 +169,7 @@ result_t doAction(game_state_t *game, player_t *player, point_t coordinates) {
  */
 int turnEndUpdate(game_state_t *game) {
 	int n_alive = 0;
-	
+
 	for (unsigned i = 0; i < darraySize(game->camps); ++i) {
 		camp_t *c = *(camp_t**)darrayGet(game->camps, i);
 		c->is_alive = 0;
@@ -195,7 +199,7 @@ int isPointInsideRect(point_t p, point_t rect[2]) {
 /**
  * Recupère un pointeur vers une cellule dans une grille de jeu selon ses coordonnées
  * déréférencer le pointeur renvoyé par cette fonction est un comportement indéfini
- * si \a co est en dehors de la grille de jeu 
+ * si \a co est en dehors de la grille de jeu
  * \param game Le jeu qui contient la grille dans laquelle chercher.
  * \param co Les coordonnées du point.
  * \return Un pointeur vers la cellule aux coordonnées `co` de type \ref cell_t

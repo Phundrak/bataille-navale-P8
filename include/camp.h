@@ -6,8 +6,7 @@
 #ifndef CAMP_H
 #define CAMP_H
 
-#include "player.h"
-#include "darray.h"
+typedef struct darray_s darray_t;
 
 /**
  * \struct camp_t

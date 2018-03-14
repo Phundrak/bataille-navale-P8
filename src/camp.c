@@ -6,9 +6,12 @@
 #include <camp.h>
 #include <string.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <darray.h>
+#include <player.h>
 
 /**
- * `newCamp` permet de créer un nouvel objet de type \ref camp_t ne contenant 
+ * `newCamp` permet de créer un nouvel objet de type \ref camp_t ne contenant
  * aucun joueur.
  * \return Pointeur sur le nouvel objet \ref camp_t
  */

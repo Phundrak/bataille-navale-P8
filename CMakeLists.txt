@@ -23,6 +23,8 @@ set(CMAKE_CC_FLAGS "${CMAKE_CC_FLAGS} ${CC_COVERAGE_COMPILE_FLAGS}")
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${CC_COVERAGE_COMPILE_FLAGS}")
 
 include_directories(include)
-file(GLOB SOURCES "src/*")
-add_executable(${TGT} ${SOURCES})
+
+add_executable(${TGT} src/dumb_player.c src/camp_allocator.c src/camp.c src/darray.c src/game_logic.c src/main.c src/player.c src/utils.c)
+add_executable(test_${TGT} test/test.c test/bataille.c src/dumb_player.c  src/camp_allocator.c src/camp.c src/darray.c src/game_logic.c src/utils.c src/player.c)
 target_link_libraries(${TGT} ncurses)
+target_link_libraries(test_${TGT} ncurses)

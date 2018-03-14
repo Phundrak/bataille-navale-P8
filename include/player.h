@@ -11,6 +11,8 @@
 /// \brief La taille d'un bateau
 #define PIECE_SIZE 5
 
+#define NBBOATS 7
+
 struct game_state_s;
 typedef struct game_state_s game_state_t;
 
@@ -28,6 +30,9 @@ typedef struct player_s {
 
 /// \brief Instancie un joueur local
 player_t *newLocalPlayer();
+
+/// \brief Instancie un joueur naif
+player_t *newDumbPlayer();
 
 /**
  * \enum color_t

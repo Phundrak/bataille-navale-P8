@@ -15,7 +15,7 @@
  * Les objets `darray_t` offrent la possibilité d’avoir des tableaux à taille variable en C, similairement aux objets
  * `vector` en C++.
  */
-typedef struct {
+typedef struct darray_s {
 	void *begin; /*!< Pointeur sur le premier élément du tableau */
 	void *end; /*!< Pointeur sur l’élément situé immédiatement après le dernier élément du tableau */
 	size_t element_size; /*!< Taille des éléments stockés dans le tableau */

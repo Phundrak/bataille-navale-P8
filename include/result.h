@@ -7,7 +7,7 @@
 #define RESULT_H
 
 /// \enum result_t Représente l'état d'une action
-typedef enum {
+typedef enum result_e {
 	REDO = -1,	/*!< Le joueur doit faire un autre choix */
 	MISS,		/*!< Le joueur a manqué son coup */
 	HIT,		/*!< Le joueur a touché un fragment de bateau */

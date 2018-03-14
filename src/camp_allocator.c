@@ -6,6 +6,8 @@
 #include <camp.h>
 #include <camp_allocator.h>
 #include <game_state.h>
+#include <darray.h>
+#include <player.h>
 
 /**
  * \struct single_camp_allocator_t

@@ -3,35 +3,23 @@
  * \brief Implémentation de la boucle principale de jeu et gestion du terminal
  */
 
-#include <signal.h>
 #include <darray.h>
 #include <game_state.h>
+#include <camp.h>
+#include <camp_allocator.h>
+#include <player.h>
+
+#include <signal.h>
 #include <stdio.h>
 #include <curses.h>
 #include <string.h>
 
 /**
- * \brief Restaure l'état du terminal et quitte le jeu.
- * \param s Le signal qui a causé l'appel de la fonction, ignoré si appelé manuellement
- */
-void interruptHandler(int s) {
-	(void)s;
-	resetty();
-	reset_shell_mode();
-	clear();
-	echo();
-	timeout(0);
-	curs_set(1);
-	endwin();
-	exit(127);
-}
-
-/**
  * \brief Fonction principale du programme
  *
- * Point d'entrée du programme. Un argument active le mode rapide, où chaque 
+ * Point d'entrée du programme. Un argument active le mode rapide, où chaque
  * joueur ne doit placer qu'un bateau dont l'indice correspond à l'argument
- * 
+ *
  * \param argc Le nombre d'arguments passé au programme.
  * \param argv Un tableau de taille argc terminé par un pointeur nul correspondant aux arguments sous forme de chaine passé au programme.
  * \return L'état de sortie du programme
@@ -41,7 +29,7 @@ int main(int argc, char *argv[argc])
 	struct sigaction s;
 	memset(&s, 0, sizeof(s));
 	s.sa_handler = interruptHandler;
-	sigemptyset(&s.sa_mask);	
+	sigemptyset(&s.sa_mask);
 	sigaction(SIGINT, &s, 0);
 
 	savetty();
@@ -61,7 +49,7 @@ int main(int argc, char *argv[argc])
 	init_pair(6, COLOR_BLACK, COLOR_MAGENTA);
 	init_pair(7, COLOR_BLACK, COLOR_CYAN);
 	init_pair(8, COLOR_BLACK, COLOR_WHITE);
-	
+
 	game_state_t *game = newGame();
 
 	if (argc >= 2) {
@@ -129,7 +117,7 @@ end:;
 	printColorArray(game, bitmap);
 	free(bitmap);
 	printf("L'équipe gagnante est { %s }\n\r", campTeamString(game->winning));
-	
+
 	// Fin du jeu, nettoyage
 	for (unsigned i = 0; i < darraySize(game->camps); ++i) {
 		camp_t *c = *(camp_t**)darrayGet(game->camps, i);
@@ -142,8 +130,8 @@ end:;
 
 	printf("Appuyez sur une touche pour terminer\n\r");
 	refresh();
-	
+
 	getch();
 	interruptHandler(0);
-    return 0;
+	return 0;
 }
