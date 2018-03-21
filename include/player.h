@@ -8,9 +8,6 @@
 
 #include "point.h"
 
-/// \brief La taille d'un bateau
-#define PIECE_SIZE 5
-
 #define NBBOATS 7
 
 struct game_state_s;
@@ -48,6 +45,14 @@ typedef enum {
 	WHITE,
 } color_t;
 
+/// \brief Structure représentant une pièce
+typedef struct {
+	char width, height;
+	char *cells;
+} piece_t;
+
+extern piece_t Pieces[NBBOATS];
+
 /// \brief Génère un tableau de couleur associé à un jeu du point de vue d'un joueur filtre
 color_t *stateToView(game_state_t *game, player_t *filter);
 
@@ -55,6 +60,6 @@ color_t *stateToView(game_state_t *game, player_t *filter);
 void printColorArray(game_state_t *game, const color_t *arr);
 
 /// \brief Fait tourner une pièce 90° dans le sens des aiguilles d'une montre `rotation_nb` fois.
-void rotate(char piece[5][5], int rotation_nb);
+void rotate(piece_t *);
 
 #endif /* PLAYER_H */

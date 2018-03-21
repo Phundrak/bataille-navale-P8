@@ -1,8 +1,7 @@
 #include <player.h>
 #include <game_state.h>
 
-extern char Pieces[][PIECE_SIZE][PIECE_SIZE];
-extern void blitToGrid(char (*piece)[5][5], point_t pos, game_state_t *game, unsigned char id);
+extern void blitToGrid(piece_t *p, point_t pos, game_state_t *game, unsigned char id);
 
 typedef struct {
 	player_t base; /*!< Instance parente */
@@ -33,8 +32,8 @@ void dumbplayerSetBoats(player_t *self, game_state_t *gs) {
 			point_t pos = localToGlobal(self, (point_t){i * 5, j * 5});
 			blitToGrid(&Pieces[all - 1], pos, gs, all);
 			all++;
-			if (all > 7) {
-				self->n_boats = 7;
+			if (all > NBBOATS) {
+				self->n_boats = all - 1;
 				return;
 			}
 		}

@@ -7,14 +7,22 @@
 #include <camp.h>
 #include <camp_allocator.h>
 
-extern char Pieces[][PIECE_SIZE][PIECE_SIZE];
-void blitToGrid(char (*piece)[5][5], point_t pos, game_state_t *game, unsigned char id);
+void blitToGrid(piece_t *piece, point_t pos, game_state_t *game, unsigned char id);
 
 void nothing() {}
 
 TEST(sink_test) {
 	game_state_t gs = {0};
-	gs.height = gs.width = PIECE_SIZE;
+
+	int maxd = 0;
+	for (int i = 0; i < NBBOATS; ++i) {
+		if (Pieces[i].width > maxd)
+			maxd = Pieces[i].width;
+		if (Pieces[i].height > maxd)
+			maxd = Pieces[i].height;
+	}
+
+	gs.height = gs.width = maxd;
 	player_t admin = {.owned_rect = {{-1, -1}, {-1, -1}}, .setup_boats = nothing};
 	player_t victime = {.setup_boats = nothing};
 	gs.camps = darrayNew(sizeof(camp_t *));
@@ -23,14 +31,16 @@ TEST(sink_test) {
 	gs.camp_allocator->put_in_camp(gs.camp_allocator, &gs, &victime);
 	gs.camp_allocator->put_in_camp(gs.camp_allocator, &gs, &admin);
 	admin.owned_rect[0] = (point_t) {-1, -1};
-	admin.owned_rect[0] = (point_t) {-1, -1};
-	gs.grid = calloc(sizeof(cell_t), PIECE_SIZE * PIECE_SIZE);
+	admin.owned_rect[1] = (point_t) {-1, -1};
+	victime.owned_rect[0] = (point_t) {0, 0};
+	victime.owned_rect[1] = (point_t) {maxd, maxd};
+	gs.grid = calloc(sizeof(cell_t), maxd * maxd);
 	for (int i = 0; i < NBBOATS; ++i) {
-		memset(gs.grid, 0, sizeof(cell_t) * PIECE_SIZE * PIECE_SIZE);
+		memset(gs.grid, 0, sizeof(cell_t) * maxd * maxd);
 		blitToGrid(&Pieces[i], (point_t){0, 0}, &gs, 1);
-		result_t r;
-		for (int y = 0; r != SUNK && y < PIECE_SIZE; ++y) {
-			for (int x = 0; r != SUNK && x < PIECE_SIZE; ++x) {
+		result_t r = MISS;
+		for (int y = 0; r != SUNK && y < maxd; ++y) {
+			for (int x = 0; r != SUNK && x < maxd; ++x) {
 				r = doAction(&gs, &admin, (point_t){x, y});
 			}
 		}
@@ -42,7 +52,7 @@ TEST(sink_test) {
 
 
 TEST(end_game) {
-	game_state_t *game = newGame();
+	game_state_t *game = newGame((option_t) {15, 15});
 
 	{
 		player_t *p = newDumbPlayer();

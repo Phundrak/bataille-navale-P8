@@ -33,8 +33,13 @@ typedef struct game_state_s {
 	camp_t *winning;					/*!< Pointe vers une équipe vivante, garantie d'être l'équipe victorieuse en fin de partie */
 } game_state_t;
 
+typedef struct {
+	int width;
+	int height;
+} option_t;
+
 /// \brief Créé un nouvel objet \ref game_state_t vide
-game_state_t *newGame();
+game_state_t *newGame(option_t);
 
 /// \brief Effectue une action d'un joueur dans le jeu
 result_t doAction(game_state_t *self, player_t *player, point_t coord);

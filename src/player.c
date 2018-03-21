@@ -19,8 +19,6 @@ typedef struct {
 	player_t base; /*!< Instance parente */
 } local_player_t;
 
-extern char Pieces[][PIECE_SIZE][PIECE_SIZE];
-
 /**
  * `printColorArray` nettoie le terminal et affiche un tableau
  * de couleur représentant un état possible du jeu
@@ -59,10 +57,10 @@ void printColorArray(game_state_t *game, const color_t *arr) {
  * \param game L'état du jeu
  * \param id L'id du bateau qui sera placé
  */
-void blitToGrid(char (*piece)[5][5], point_t pos, game_state_t *game, unsigned char id) {
-	for (int i = 0; i < 5; ++i)
-		for (int j = 0; j < 5; ++j) {
-			char v = (*piece)[i][j];
+void blitToGrid(piece_t *piece, point_t pos, game_state_t *game, unsigned char id) {
+	for (int i = 0; i < piece->height; ++i)
+		for (int j = 0; j < piece->width; ++j) {
+			char v = piece->cells[piece->width * i + j] != ' ';
 			if (!v)
 				continue;
 			if (j + pos.x >= game->width) {
@@ -88,11 +86,11 @@ void blitToGrid(char (*piece)[5][5], point_t pos, game_state_t *game, unsigned c
  * \return le nombre de fragments du bateau sont superposé avec des éléments où un frament ne
  * peut pas être placé. Utilisé pour la gestion de collision.
  */
-int blitBoat(char (*piece)[5][5], color_t *arr, point_t pos, game_state_t *game, int *add) {
+int blitBoat(piece_t *piece, color_t *arr, point_t pos, game_state_t *game, int *add) {
 	int acc = 0;
-	for (int i = 0; i < 5; ++i)
-		for (int j = 0; j < 5; ++j) {
-			char v = (*piece)[i][j];
+	for (int i = 0; i < piece->height; ++i)
+		for (int j = 0; j < piece->width; ++j) {
+			char v = piece->cells[piece->width * i + j] != ' ';
 			if (!v)
 				continue;
 			if (j + pos.x >= game->width) {
@@ -188,16 +186,16 @@ static void playerLocalSetBoats(player_t *self, game_state_t *game) {
 		(self->owned_rect[0].x + self->owned_rect[1].x) / 2,
 		(self->owned_rect[0].y + self->owned_rect[1].y) / 2
 	};
-	for(int i = 0; i < 7;) {
+	for(int i = 0; i < NBBOATS;) {
 		if (game->cheat > -1)
 			i = game->cheat;
-		char boat_mem[5][5];
-		char (*boat)[5][5] = &boat_mem;
-		memcpy(boat, Pieces[i], sizeof(boat_mem));
+		piece_t boat;
+		memcpy(&boat, &Pieces[i], sizeof(boat));
+		boat.cells = strdup(boat.cells);
 		while (1) {
 			color_t *arr = stateToView(game, self);
 			int k = 0;
-			int coll = blitBoat(boat, arr, r, game, &k);
+			int coll = blitBoat(&boat, arr, r, game, &k);
 			printColorArray(game, arr);
 			printw("[%s] Fleches pour deplacer, r pour tourner, espace pour valider\n\r", self->name);
 			// C'était soit switch et goto, soit une série de if-else
@@ -206,7 +204,7 @@ static void playerLocalSetBoats(player_t *self, game_state_t *game) {
 				if (!coll) {
 					prev = r;
 					++i;
-					blitToGrid(boat, r, game, ++game->alloc_id);
+					blitToGrid(&boat, r, game, ++game->alloc_id);
 					r = (point_t) {
 						(self->owned_rect[0].x + self->owned_rect[1].x) / 2,
 						(self->owned_rect[0].y + self->owned_rect[1].y) / 2
@@ -217,10 +215,11 @@ static void playerLocalSetBoats(player_t *self, game_state_t *game) {
 				else
 					r = prev;
 				free(arr);
+				free(boat.cells);
 				break;
 			}
 			else if (c == 'r')
-				rotate(*boat, 1);
+				rotate(&boat);
 			else if (c == '\033')
 				cursorMovement(&r, game);
 			else if (c == 4)
@@ -228,7 +227,7 @@ static void playerLocalSetBoats(player_t *self, game_state_t *game) {
 			free(arr);
 		}
 	}
-	self->n_boats = 7;
+	self->n_boats = NBBOATS;
 	if (game->cheat > -1)
 		self->n_boats = 1;
 }
@@ -268,134 +267,63 @@ color_t *stateToView(game_state_t *game, player_t *filter) {
 	return arr;
 }
 
-/**
- * `cyclicRoll` fait une rotation dans un sens des quatres caractères pointés par a, b, c, et d.
- * \param a Un pointeur vers un caractère.
- * \param b Un pointeur vers un caractère.
- * \param c Un pointeur vers un caractère.
- * \param d Un pointeur vers un caractère.
- * \return Tableau de couleur représentant le bitmap de l'état du jeu
- */
-void cyclicRoll(char *a, char *b, char *c, char *d) {
-	char temp = *a;
-	*a = *b;
-	*b = *c;
-	*c = *d;
-	*d = temp;
+void transpose(piece_t *piece) {
+	char tmp[piece->width * piece->height];
+	memset(tmp, 0, sizeof(tmp));
+	char *it = tmp;
+	for (int j = 0; j < piece->width; ++j)
+		for (int i = piece->height - 1; i >= 0; --i)
+			*it++ = piece->cells[piece->width * i + j];
+	memcpy(piece->cells, tmp, sizeof(tmp));
+	int w = piece->width;
+	piece->width = piece->height;
+	piece->height = w;
 }
 
-/**
- * `emptyLine` détermine si la ligne `line` est vide.
- * \param piece Pièce à vérifier.
- * \param line Indice de la ligne à vérifier.
- * \return 0 si la ligne contient au moins un élément, ou 1 dans le cas contraire
- */
-int emptyLine(char piece[PIECE_SIZE][PIECE_SIZE], int line) {
-	int loop;
-	for (loop = 0; loop < PIECE_SIZE; ++loop)
-		if (piece[line][loop] != 0)
-			return 0;
-	return 1;
-}
-
-/**
- * `emptyColumn` détermine si la colonne `column` est vide.
- * \param piece Pièce à vérifier.
- * \param column Indice de la ligne à vérifier.
- * \return 0 si la colonne contient au moins un élément, ou 1 dans le cas contraire
- */
-int emptyColumn(char piece[PIECE_SIZE][PIECE_SIZE], int column) {
-	int loop;
-	for (loop = 0; loop < PIECE_SIZE; ++loop)
-		if (piece[loop][column] != 0)
-			return 0;
-	return 1;
-}
-
-/**
- * `shiftColumnLeft` déplace tout les éléments d'une pièce d'une colonne vers la gauche.
- * \param piece Pièce à modifier.
- */
-void shiftColumnLeft(char piece[PIECE_SIZE][PIECE_SIZE]) {
-	int column;
-	for (column = 0; column < PIECE_SIZE; ++column) {
-		memmove(&piece[column][0], &piece[column][1], PIECE_SIZE - 1);
-		piece[column][PIECE_SIZE - 1] = 0;
+char *strrev(char *str) {
+	char *e = str;
+	while (*e) ++e;
+	--e;
+	char *s = str;
+	while (s < e) {
+		char t = *s;
+		*s = *e;
+		*e = t;
+		++s;
+		--e;
 	}
+	return str;
 }
 
-/**
- * `shiftLineUp` déplace tout les éléments d'une pièce d'une ligne vers le haut.
- * \param piece Pièce à modifier.
- */
-void shiftLineUp(char piece[PIECE_SIZE][PIECE_SIZE]) {
-	memmove(&piece[0][0], &piece[1][0], sizeof(piece[0]) * (PIECE_SIZE - 1));
-	memset(&piece[PIECE_SIZE-1], 0, PIECE_SIZE);
-}
-
-/**
- * `realignPiece` élimine les lignes et colonnes vides d'une pièces
- * \param piece Pièce à modifier.
- */
-void realignPiece(char piece[PIECE_SIZE][PIECE_SIZE]) {
-	while (emptyColumn(piece, 0))
-		shiftColumnLeft(piece);
-	while (emptyLine(piece, 0))
-		shiftLineUp(piece);
-}
 
 /**
  * `rotate` effectue un certain nombre de rotation à 90° d'une pièce dans le sens horaire
  * \param piece Pièce à modifier.
  * \param rotation_nb Nombre de rotations à effectuer.
  */
-void rotate(char piece[5][5], int rotation_nb) {
-	int outer_loop, inner_loop, rotations;
-	for (rotations = 0; rotations < rotation_nb; ++rotations) {
-		for (outer_loop = 0; outer_loop < PIECE_SIZE / 2; ++outer_loop)
-			for (inner_loop = 0; inner_loop < (PIECE_SIZE + 1) / 2; ++inner_loop)
-				cyclicRoll(
-						&piece[outer_loop][inner_loop],
-						&piece[PIECE_SIZE - 1 - inner_loop][outer_loop],
-						&piece[PIECE_SIZE - 1 - outer_loop][PIECE_SIZE - 1 - inner_loop],
-						&piece[inner_loop][PIECE_SIZE - 1 - outer_loop]);
-	}
-	realignPiece(piece);
+void rotate(piece_t *piece) {
+	transpose(piece);
+	//strrev(piece->cells);
 }
 
 /// \brief Tableau des pièces représentant un type de bateau
-char Pieces[][PIECE_SIZE][PIECE_SIZE] = {{{1, 1, 0, 0, 0},
-										  {1, 1, 0, 0, 0},
-										  {0, 0, 0, 0, 0},
-										  {0, 0, 0, 0, 0},
-										  {0, 0, 0, 0, 0}},
-										 {{1, 1, 1, 1, 0},
-										  {1, 1, 1, 1, 0},
-										  {0, 0, 0, 0, 0},
-										  {0, 0, 0, 0, 0},
-										  {0, 0, 0, 0, 0}},
-										 {{1, 1, 0, 0, 0},
-										  {0, 0, 0, 0, 0},
-										  {0, 0, 0, 0, 0},
-										  {0, 0, 0, 0, 0},
-										  {0, 0, 0, 0, 0}},
-										 {{1, 1, 1, 0, 0},
-										  {0, 0, 0, 0, 0},
-										  {0, 0, 0, 0, 0},
-										  {0, 0, 0, 0, 0},
-										  {0, 0, 0, 0, 0}},
-										 {{1, 1, 1, 1, 0},
-										  {0, 0, 0, 0, 0},
-										  {0, 0, 0, 0, 0},
-										  {0, 0, 0, 0, 0},
-										  {0, 0, 0, 0, 0}},
-										 {{1, 1, 1, 1, 1},
-										  {0, 0, 0, 0, 0},
-										  {0, 0, 0, 0, 0},
-										  {0, 0, 0, 0, 0},
-										  {0, 0, 0, 0, 0}},
-										 {{1, 1, 1, 1, 0},
-										  {0, 0, 0, 1, 0},
-										  {0, 0, 0, 1, 0},
-										  {0, 0, 0, 0, 0},
-										  {0, 0, 0, 0, 0}}};
+piece_t Pieces[NBBOATS] = {
+	{2, 2,
+	 "xx"
+	 "xx"},
+	{4, 2,
+	 "xxxx"
+	 "xxxx"},
+	{2, 1,
+	 "xx"},
+	{3, 1,
+	 "xxx"},
+	{4, 1,
+	 "xxxx"},
+	{5, 1,
+	 "xxxxx"},
+	{4, 3,
+	 "xxxx"
+	 "   x"
+	 "   x"},
+};

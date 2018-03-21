@@ -21,11 +21,11 @@
  * avec un allocateur d'équipe par défaut et la triche désactivé
  * \return Un nouvel état de jeu
  */
-game_state_t *newGame(/*Options*/) {
+game_state_t *newGame(option_t opt) {
 	game_state_t *ret = calloc(sizeof(*ret), 1);
 
-	ret->width = 17 * 2;
-	ret->height = 17;
+	ret->width = opt.width * 2;
+	ret->height = opt.height;
 	ret->grid = calloc(sizeof(cell_t), ret->width * ret->height);
 	ret->camps = darrayNew(sizeof(camp_t *));
 	ret->cheat = -1;

@@ -50,11 +50,14 @@ int main(int argc, char *argv[argc])
 	init_pair(7, COLOR_BLACK, COLOR_CYAN);
 	init_pair(8, COLOR_BLACK, COLOR_WHITE);
 
-	game_state_t *game = newGame();
+	for (int i = 0; i < NBBOATS; ++i)
+		Pieces[i].cells = strdup(Pieces[i].cells);
+
+	game_state_t *game = newGame((option_t) {17, 17});
 
 	if (argc >= 2) {
 		game->cheat = atoi(argv[1]); // NOLINT
-		if (game->cheat < 0 || game->cheat >= 7)
+		if (game->cheat < 0 || game->cheat >= NBBOATS)
 			game->cheat = -1;
 	}
 
@@ -130,6 +133,9 @@ end:;
 
 	printf("Appuyez sur une touche pour terminer\n\r");
 	refresh();
+
+	for (int i = 0; i < NBBOATS; ++i)
+		free(Pieces[i].cells);
 
 	getch();
 	interruptHandler(0);
