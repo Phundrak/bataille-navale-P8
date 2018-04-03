@@ -195,8 +195,8 @@ static void playerLocalSetBoats(player_t *self, game_state_t *game) {
 		boat.cells = strdup(boat.cells);
 		while (1) {
 			color_t *arr = stateToView(game, self);
-			int k = 0;
-			int coll = blitBoat(&boat, arr, centre_jeu, game, &k);
+			int nr_fragments = 0;
+			int coll = blitBoat(&boat, arr, centre_jeu, game, &nr_fragments);
 			printColorArray(game, arr);
 			printw("[%s] Fleches pour deplacer, centre_jeu pour tourner, espace pour valider\n\r", self->name);
 			// C'était soit switch et goto, soit une série de if-else
@@ -292,16 +292,16 @@ void transpose(piece_t *piece) {
  * \return La même valeur que str.
  */
 char *strrev(char *str) {
-	char *character = str;
-	while (*character) ++character;
-	--character;
-	char *s = str;
-	while (s < character) {
-		char t = *s;
-		*s = *character;
-		*character = t;
-		++s;
-		--character;
+	char *character1 = str;
+	while (*character1) ++character1;
+	--character1;
+	char *character2 = str;
+	while (character2 < character1) {
+		char t = *character2;
+		*character2 = *character1;
+		*character1 = t;
+		++character2;
+		--character1;
 	}
 	return str;
 }
