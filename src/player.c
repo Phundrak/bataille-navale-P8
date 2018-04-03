@@ -147,6 +147,7 @@ static void cursorMovement(point_t *coords_curseur, game_state_t *game) {
  * `playerLocalAction` gère un tour d'un joueur local dans le jeu `game`
  * \param self Pointeur vers l'instance parente du joueur
  * \param game L'état du jeu
+ * \return La coordonnée que le joueur souhaite tester.
  */
 static point_t playerLocalAction(player_t *self, game_state_t *game) {
 	point_t centre_jeu = {game->width / 2, game->height / 2};

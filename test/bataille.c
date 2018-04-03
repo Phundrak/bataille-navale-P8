@@ -1,3 +1,8 @@
+/**
+ * \file bataille.c
+ * \brief Implémentation des tests du jeu de bataille navale
+ */
+
 #include <test_framework.h>
 #include <game_state.h>
 #include <cell.h>
@@ -9,8 +14,13 @@
 
 void blitToGrid(piece_t *piece, point_t pos, game_state_t *game, unsigned char id);
 
+/// \brief Fait littéralement rien.
 void nothing() {}
 
+/**
+ * Test si tout les bateaux sont coulables
+ * return 1 si le test a passé, sinon 0
+ */
 TEST(sink_test) {
 	game_state_t gs = {0};
 
@@ -50,7 +60,10 @@ TEST(sink_test) {
 	return 1;
 }
 
-
+/**
+ * Test si une partie finie bien.
+ * return 1 si le test a passé, sinon 0
+ */
 TEST(end_game) {
 	game_state_t *game = newGame((option_t) {15, 15});
 
