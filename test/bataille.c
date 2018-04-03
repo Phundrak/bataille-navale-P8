@@ -7,19 +7,18 @@
 #include <game_state.h>
 #include <cell.h>
 #include <player.h>
-#include <stdlib.h>
 #include <darray.h>
 #include <camp.h>
 #include <camp_allocator.h>
 
 void blitToGrid(piece_t *piece, point_t pos, game_state_t *game, unsigned char id);
 
-/// \brief Fait littéralement rien.
+/// \brief Ne fait littéralement rien.
 void nothing() {}
 
 /**
- * Test si tout les bateaux sont coulables
- * return 1 si le test a passé, sinon 0
+ * Teste si tout les bateaux sont coulables
+ * \return 1 si le test a passé, sinon 0
  */
 TEST(sink_test) {
 	game_state_t game_state = {0};
@@ -61,8 +60,8 @@ TEST(sink_test) {
 }
 
 /**
- * Test si une partie finie bien.
- * return 1 si le test a passé, sinon 0
+ * Test si une partie finis bien.
+ * \return 1 si le test a passé, sinon 0
  */
 TEST(end_game) {
 	game_state_t *game = newGame((option_t) {15, 15});

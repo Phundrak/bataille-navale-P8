@@ -49,9 +49,9 @@ test_t *find_test(char *test_name) {
 }
 
 /**
- * Point d'entrée du programme.
- * L'option -l permet de lister les tests disponible
- * Sans argument: exécute tout les tests disponibles.
+ * Point d'entrée du programme.\n
+ * L'option -l permet de lister les tests disponible\n
+ * Sans argument: exécute tout les tests disponibles.\n
  * Si plusieurs arguments: exécute tout les tests dont les noms correspondent aux
  * arguments
  * \return 0 si tout s'est bien passé, 1 si un test a échoué

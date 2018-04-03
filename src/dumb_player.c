@@ -34,8 +34,11 @@ point_t dumbPlayerAction(player_t *player, game_state_t *game_state) {
 }
 
 /**
-   `localToGlobal` convertit des coordonnées locales dans le repère
-   d'un joueur en coordonnées globales dans le plateau de jeu.
+ * `localToGlobal` convertit des coordonnées locales dans le repère
+ * d'un joueur en coordonnées globales dans le plateau de jeu.
+ * \param self Joueur actif
+ * \param point Coordonnées locales de \p self
+ * \return Équivalent global de \p point
  */
 point_t localToGlobal(player_t *self, point_t point) {
 	return (point_t) {
