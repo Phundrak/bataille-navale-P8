@@ -30,10 +30,10 @@ void printColorArray(game_state_t *game, const color_t *arr) {
 	refresh();
 	color_t current = BLACK;
 	attron(COLOR_PAIR(current));
-	for (int i = 0; i < (int)game->height; ++i) {
-		for (int j = 0; j < (int)game->width; ++j) {
-			move(i, j * 2);
-			color_t c = arr[game->width * i + j];
+	for (int outer_loop = 0; outer_loop < (int)game->height; ++outer_loop) {
+		for (int inner_loop = 0; inner_loop < (int)game->width; ++inner_loop) {
+			move(outer_loop, inner_loop * 2);
+			color_t c = arr[game->width * outer_loop + inner_loop];
 			if (c != current) {
 				attroff(COLOR_PAIR(current));
 				// current = c;
@@ -58,20 +58,20 @@ void printColorArray(game_state_t *game, const color_t *arr) {
  * \param id L'id du bateau qui sera placé
  */
 void blitToGrid(piece_t *piece, point_t pos, game_state_t *game, unsigned char id) {
-	for (int i = 0; i < piece->height; ++i)
-		for (int j = 0; j < piece->width; ++j) {
-			char v = piece->cells[piece->width * i + j] != ' ';
+	for (int outer_loop = 0; outer_loop < piece->height; ++outer_loop)
+		for (int inner_loop = 0; inner_loop < piece->width; ++inner_loop) {
+			char v = piece->cells[piece->width * outer_loop + inner_loop] != ' ';
 			if (!v)
 				continue;
-			if (j + pos.x >= game->width) {
+			if (inner_loop + pos.x >= game->width) {
 				continue;
 			}
-			if (i + pos.y >= game->height) {
+			if (outer_loop + pos.y >= game->height) {
 				continue;
 			}
-			cell_t *c = &game->grid[game->width * (i + pos.y) + (j + pos.x)];
-			c->has_boat |= 1;
-			c->boat_id = id;
+			cell_t *cell = &game->grid[game->width * (outer_loop + pos.y) + (inner_loop + pos.x)];
+			cell->has_boat |= 1;
+			cell->boat_id = id;
 		}
 }
 
@@ -88,23 +88,23 @@ void blitToGrid(piece_t *piece, point_t pos, game_state_t *game, unsigned char i
  */
 int blitBoat(piece_t *piece, color_t *arr, point_t pos, game_state_t *game, int *add) {
 	int acc = 0;
-	for (int i = 0; i < piece->height; ++i)
-		for (int j = 0; j < piece->width; ++j) {
-			char v = piece->cells[piece->width * i + j] != ' ';
-			if (!v)
+	for (int outer_loop = 0; outer_loop < piece->height; ++outer_loop)
+		for (int inner_loop = 0; inner_loop < piece->width; ++inner_loop) {
+			char has_boat_piece = piece->cells[piece->width * outer_loop + inner_loop] != ' ';
+			if (!has_boat_piece)
 				continue;
-			if (j + pos.x >= game->width) {
-				acc += 1 + game->width - (j + pos.x);
-				continue;
-			}
-			if (i + pos.y >= game->height) {
-				acc += 1 + game->height - (i + pos.y);
+			if (inner_loop + pos.x >= game->width) {
+				acc += 1 + game->width - (inner_loop + pos.x);
 				continue;
 			}
-			color_t *c = &arr[game->width * (i + pos.y) + (j + pos.x)];
-			acc += (*c != CYAN);
+			if (outer_loop + pos.y >= game->height) {
+				acc += 1 + game->height - (outer_loop + pos.y);
+				continue;
+			}
+			color_t *color = &arr[game->width * (outer_loop + pos.y) + (inner_loop + pos.x)];
+			acc += (*color != CYAN);
 			add[0] += 1;
-			*c = WHITE;
+			*color = WHITE;
 		}
 	return acc;
 }
@@ -112,28 +112,28 @@ int blitBoat(piece_t *piece, color_t *arr, point_t pos, game_state_t *game, int 
 /**
  * `cursorMovement` gère une itération du mouvement d'un curseur aux
  * coordonnées pointées par `r` dans un état du jeu `game`
- * \param r pointeur vers les coordonnées du curseur
+ * \param coords_curseur pointeur vers les coordonnées du curseur
  * \param game L'état du jeu
  */
-static void cursorMovement(point_t *r, game_state_t *game) {
+static void cursorMovement(point_t *coords_curseur, game_state_t *game) {
 	switch(getch()) {
 	case '[':
 		switch(getch()) {
 		case 'A':
-			if (r->y > 0)
-				--r->y;
+			if (coords_curseur->y > 0)
+				--coords_curseur->y;
 			break;
 		case 'B':
-			if (r->y < game->height - 1)
-				++r->y;
+			if (coords_curseur->y < game->height - 1)
+				++coords_curseur->y;
 			break;
 		case 'C':
-			if (r->x < game->width - 1)
-				++r->x;
+			if (coords_curseur->x < game->width - 1)
+				++coords_curseur->x;
 			break;
 		case 'D':
-			if (r->x > 0)
-				--r->x;
+			if (coords_curseur->x > 0)
+				--coords_curseur->x;
 			break;
 		default:
 			break;
@@ -149,30 +149,30 @@ static void cursorMovement(point_t *r, game_state_t *game) {
  * \param game L'état du jeu
  */
 static point_t playerLocalAction(player_t *self, game_state_t *game) {
-	point_t r = {game->width / 2, game->height / 2};
+	point_t centre_jeu = {game->width / 2, game->height / 2};
 	while (1) {
 		color_t *arr = stateToView(game, self);
-		arr[game->width * r.y + r.x] = BLACK;
+		arr[game->width * centre_jeu.y + centre_jeu.x] = BLACK;
 		printColorArray(game, arr);
 		printw("Tour du joueur %s\n\r", self->name);
 		refresh();
 		free(arr);
 		while (1) {
-			int c = getch();
-			if (c == ' ')
-				return r;
-			else if (c == '\033') {
-				cursorMovement(&r, game);
+			int key = getch();
+			if (key == ' ')
+				return centre_jeu;
+			else if (key == '\033') {
+				cursorMovement(&centre_jeu, game);
 				break;
 			}
-			else if (c == 4) {
+			else if (key == 4) {
 				interruptHandler(0);
 				break;
 			}
 		}
 	}
 	// unreachable
-	return r;
+	return centre_jeu;
 }
 
 /**
@@ -182,47 +182,47 @@ static point_t playerLocalAction(player_t *self, game_state_t *game) {
  */
 static void playerLocalSetBoats(player_t *self, game_state_t *game) {
 	point_t prev = {0, 0};
-	point_t r = {
+	point_t centre_jeu = {
 		(self->owned_rect[0].x + self->owned_rect[1].x) / 2,
 		(self->owned_rect[0].y + self->owned_rect[1].y) / 2
 	};
-	for(int i = 0; i < NBBOATS;) {
+	for(int outer_loop = 0; outer_loop < NBBOATS;) {
 		if (game->cheat > -1)
-			i = game->cheat;
+			outer_loop = game->cheat;
 		piece_t boat;
-		memcpy(&boat, &Pieces[i], sizeof(boat));
+		memcpy(&boat, &Pieces[outer_loop], sizeof(boat));
 		boat.cells = strdup(boat.cells);
 		while (1) {
 			color_t *arr = stateToView(game, self);
 			int k = 0;
-			int coll = blitBoat(&boat, arr, r, game, &k);
+			int coll = blitBoat(&boat, arr, centre_jeu, game, &k);
 			printColorArray(game, arr);
-			printw("[%s] Fleches pour deplacer, r pour tourner, espace pour valider\n\r", self->name);
+			printw("[%s] Fleches pour deplacer, centre_jeu pour tourner, espace pour valider\n\r", self->name);
 			// C'était soit switch et goto, soit une série de if-else
-			int c = getch();
-			if (c == ' ') {
+			int key = getch();
+			if (key == ' ') {
 				if (!coll) {
-					prev = r;
-					++i;
-					blitToGrid(&boat, r, game, ++game->alloc_id);
-					r = (point_t) {
+					prev = centre_jeu;
+					++outer_loop;
+					blitToGrid(&boat, centre_jeu, game, ++game->alloc_id);
+					centre_jeu = (point_t) {
 						(self->owned_rect[0].x + self->owned_rect[1].x) / 2,
 						(self->owned_rect[0].y + self->owned_rect[1].y) / 2
 					};
 					if (game->cheat > -1)
-						i = 10;
+						outer_loop = 10;
 				}
 				else
-					r = prev;
+					centre_jeu = prev;
 				free(arr);
 				free(boat.cells);
 				break;
 			}
-			else if (c == 'r')
+			else if (key == 'r')
 				rotate(&boat);
-			else if (c == '\033')
-				cursorMovement(&r, game);
-			else if (c == 4)
+			else if (key == '\033')
+				cursorMovement(&centre_jeu, game);
+			else if (key == 4)
 				interruptHandler(0);
 			free(arr);
 		}
@@ -257,12 +257,12 @@ color_t *stateToView(game_state_t *game, player_t *filter) {
 	static const color_t player_colors[] = {CYAN, WHITE, YELLOW, MAGENTA, BLACK, BLACK, BLACK, RED};
 	static const color_t foe_colors[] = {BLUE, BLUE, CYAN, MAGENTA, BLACK, BLACK, BLACK, RED};
 
-	for (size_t i = 0; i < game->height; ++i)
-		for (size_t j = 0; j < game->width; ++j) {
-			int state = game->grid[game->width * i + j].state & 0x7;
-			const color_t *values = isPointInsideRect((point_t){j, i}, filter->owned_rect) ?
+	for (size_t outer_loop = 0; outer_loop < game->height; ++outer_loop)
+		for (size_t inner_loop = 0; inner_loop < game->width; ++inner_loop) {
+			int state = game->grid[game->width * outer_loop + inner_loop].state & 0x7;
+			const color_t *values = isPointInsideRect((point_t){inner_loop, outer_loop}, filter->owned_rect) ?
 															(const color_t*)player_colors : foe_colors;
-			arr[game->width * i + j] = values[state];
+			arr[game->width * outer_loop + inner_loop] = values[state];
 		}
 	return arr;
 }
@@ -270,27 +270,27 @@ color_t *stateToView(game_state_t *game, player_t *filter) {
 void transpose(piece_t *piece) {
 	char tmp[piece->width * piece->height];
 	memset(tmp, 0, sizeof(tmp));
-	char *it = tmp;
-	for (int j = 0; j < piece->width; ++j)
-		for (int i = piece->height - 1; i >= 0; --i)
-			*it++ = piece->cells[piece->width * i + j];
+	char *iter = tmp;
+	for (int outer_loop = 0; outer_loop < piece->width; ++outer_loop)
+		for (int inner_loop = piece->height - 1; inner_loop >= 0; --inner_loop)
+			*iter++ = piece->cells[piece->width * inner_loop + outer_loop];
 	memcpy(piece->cells, tmp, sizeof(tmp));
-	int w = piece->width;
+	int width = piece->width;
 	piece->width = piece->height;
-	piece->height = w;
+	piece->height = (char) width;
 }
 
 char *strrev(char *str) {
-	char *e = str;
-	while (*e) ++e;
-	--e;
+	char *character = str;
+	while (*character) ++character;
+	--character;
 	char *s = str;
-	while (s < e) {
+	while (s < character) {
 		char t = *s;
-		*s = *e;
-		*e = t;
+		*s = *character;
+		*character = t;
 		++s;
-		--e;
+		--character;
 	}
 	return str;
 }
@@ -303,7 +303,6 @@ char *strrev(char *str) {
  */
 void rotate(piece_t *piece) {
 	transpose(piece);
-	//strrev(piece->cells);
 }
 
 /// \brief Tableau des pièces représentant un type de bateau

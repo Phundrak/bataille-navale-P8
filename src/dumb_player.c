@@ -8,29 +8,29 @@ typedef struct {
 	point_t last;
 } dumb_player_t;
 
-point_t dumbPlayerAction(player_t *p, game_state_t *gs) {
-	dumb_player_t *self = (void*)p;
+point_t dumbPlayerAction(player_t *player, game_state_t *game_state) {
+	dumb_player_t *self = (void*)player;
 	++self->last.x;
-	if (self->last.x >= gs->width) {
-		self->last.x -= gs->width;
+	if (self->last.x >= game_state->width) {
+		self->last.x -= game_state->width;
 		++self->last.y;
 	}
 	return self->last;
 }
 
-point_t localToGlobal(player_t *self, point_t p) {
+point_t localToGlobal(player_t *self, point_t point) {
 	return (point_t) {
-		p.x + self->owned_rect[0].x,
-		p.y + self->owned_rect[0].y
+		point.x + self->owned_rect[0].x,
+		point.y + self->owned_rect[0].y
 	};
 }
 
 void dumbplayerSetBoats(player_t *self, game_state_t *gs) {
 	int all = 1;
-	for (int i = 0; i < 3; ++i)
-		for (int j = 0; j < 3; ++j) {
-			point_t pos = localToGlobal(self, (point_t){i * 5, j * 5});
-			blitToGrid(&Pieces[all - 1], pos, gs, all);
+	for (int outer_loop = 0; outer_loop < 3; ++outer_loop)
+		for (int inner_loop = 0; inner_loop < 3; ++inner_loop) {
+			point_t pos = localToGlobal(self, (point_t){(size_t) (outer_loop * 5), (size_t) (inner_loop * 5)});
+			blitToGrid(&Pieces[all - 1], pos, gs, (unsigned char) all);
 			all++;
 			if (all > NBBOATS) {
 				self->n_boats = all - 1;

@@ -50,8 +50,8 @@ int main(int argc, char *argv[argc])
 	init_pair(7, COLOR_BLACK, COLOR_CYAN);
 	init_pair(8, COLOR_BLACK, COLOR_WHITE);
 
-	for (int i = 0; i < NBBOATS; ++i)
-		Pieces[i].cells = strdup(Pieces[i].cells);
+	for (int loop = 0; loop < NBBOATS; ++loop)
+		Pieces[loop].cells = strdup(Pieces[loop].cells);
 
 	game_state_t *game = newGame((option_t) {17, 17});
 
@@ -63,32 +63,32 @@ int main(int argc, char *argv[argc])
 
 	// Cas d'un jeu deux joueurs local
 	{
-		player_t *p = newLocalPlayer();
-		p->name = "Joueur 1";
-		game->camp_allocator->put_in_camp(game->camp_allocator, game, p);
-		p = newLocalPlayer();
-		p->name = "Joueur 2";
-		game->camp_allocator->put_in_camp(game->camp_allocator, game, p);
+		player_t *player = newLocalPlayer();
+		player->name = "Joueur 1";
+		game->camp_allocator->put_in_camp(game->camp_allocator, game, player);
+		player = newLocalPlayer();
+		player->name = "Joueur 2";
+		game->camp_allocator->put_in_camp(game->camp_allocator, game, player);
 	}
 
 	while (1) {
-		for(unsigned i = 0; i < darraySize(game->camps); ++i) {
-			camp_t *camp = *(camp_t **)darrayGet(game->camps, i);
+		for(unsigned outer_loop = 0; outer_loop < darraySize(game->camps); ++outer_loop) {
+			camp_t *camp = *(camp_t **)darrayGet(game->camps, outer_loop);
 			player_t *players = *(player_t**)darrayGet(camp->players, 0);
-			size_t n = darraySize(camp->players);
-			while (n--) {
+			size_t nr_players = darraySize(camp->players);
+			while (nr_players--) {
 				if (players->n_boats == 0) {
 					++players;
 					continue;
 				}
 				point_t coordinates;
-				result_t r;
+				result_t result;
 				do {
 					coordinates = players->get_action(players, game);
-					r = doAction(game, players, coordinates);
+					result = doAction(game, players, coordinates);
 					clear();
 					refresh();
-					switch (r) {
+					switch (result) {
 					case REDO:
 						break;
 					case HIT:
@@ -103,7 +103,7 @@ int main(int argc, char *argv[argc])
 					}
 					printf("\r");
 					fflush(stdout);
-				} while(r == REDO);
+				} while(result == REDO);
 				if (!turnEndUpdate(game))
 					goto end;
 				printf("C'est le tour du joueur suivant, appuyez sur espace\n\r");
@@ -123,8 +123,8 @@ end:;
 
 	// Fin du jeu, nettoyage
 	for (unsigned i = 0; i < darraySize(game->camps); ++i) {
-		camp_t *c = *(camp_t**)darrayGet(game->camps, i);
-		deleteCamp(c);
+		camp_t *camp = *(camp_t**)darrayGet(game->camps, i);
+		deleteCamp(camp);
 	}
 	darrayDelete(game->camps);
 	free(game->grid);

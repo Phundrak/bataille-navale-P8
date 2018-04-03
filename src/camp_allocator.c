@@ -36,7 +36,7 @@ static void singleAllocateCamp(camp_allocator_t *base, game_state_t *game, playe
 	darrayPushBack(camp->players, &p);
 	darrayPushBack(game->camps, &camp);
 
-	int bidx = (game->width / 2) * self->alloc_number;
+	int bidx = (int) ((game->width / 2) * self->alloc_number);
 	p->owned_rect[0] = (point_t) {
 			bidx % game->width,
 			bidx / game->width * game->height

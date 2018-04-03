@@ -42,21 +42,21 @@ typedef struct {
 game_state_t *newGame(option_t);
 
 /// \brief Effectue une action d'un joueur dans le jeu
-result_t doAction(game_state_t *self, player_t *player, point_t coord);
+result_t doAction(game_state_t *self, player_t *player, point_t point);
 
 /// \brief Vérifie si le jeu est fini
 int turnEndUpdate(game_state_t *game);
 
 /// \brief Détermine si un point est dans un rectangle
-int isPointInsideRect(point_t p, point_t rect[2]);
+int isPointInsideRect(point_t point, point_t rect[2]);
 
 /// \brief Restaure le terminal et met fin au jeu
 void interruptHandler(int s);
 
 /// \brief Donne un pointeur vers une cellule selon ses coordonnées
-cell_t *getCell(game_state_t *game, point_t co);
+cell_t *getCell(game_state_t *game, point_t point);
 
 /// \brief Donne les coordonnées d'une cellule selon son pointeur
-point_t getCoordinates(game_state_t *game, cell_t *c);
+point_t getCoordinates(game_state_t *game, cell_t *cell);
 
 #endif /* GAME_STATE_H */

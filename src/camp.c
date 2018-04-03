@@ -30,18 +30,18 @@ camp_t *newCamp() {
  * \param self Pointeur vers le camp
  */
 char *campTeamString(camp_t *self) {
-	size_t n = darraySize(self->players);
+	size_t nr_players = darraySize(self->players);
 	player_t *players = *(player_t **)darrayGet(self->players, 0);
-	size_t len = 0;
-	for (unsigned i = 0; i < n; ++i) {
-		len += players[i].name ? strlen(players[i].name) : 0;
+	size_t length = 0;
+	for (unsigned loop = 0; loop < nr_players; ++loop) {
+		length += players[loop].name ? strlen(players[loop].name) : 0;
 	}
-	self->team_string = malloc(len + (2 * (len - 1)) + 1);
-	char *it = self->team_string;
-	for (unsigned i = 0; i < n; ++i) {
-		it += sprintf(it, "%s", players[i].name);
-		if (i < n - 1)
-			it += sprintf(it, ", ");
+	self->team_string = malloc(length + (2 * (length - 1)) + 1);
+	char *iter = self->team_string;
+	for (unsigned i = 0; i < nr_players; ++i) {
+		iter += sprintf(iter, "%s", players[i].name);
+		if (i < nr_players - 1)
+			iter += sprintf(iter, ", ");
 	}
 	return self->team_string;
 }
@@ -51,8 +51,8 @@ char *campTeamString(camp_t *self) {
  * \param self Pointeur vers le camp
  */
 void deleteCamp(camp_t *self) {
-	for (unsigned j = 0; j < darraySize(self->players); ++j) {
-		player_t *player = *(player_t**)darrayGet(self->players, j);
+	for (unsigned loop = 0; loop < darraySize(self->players); ++loop) {
+		player_t *player = *(player_t**)darrayGet(self->players, loop);
 		/* TODO: call proper deallocation routine */
 		free(player);
 	}
