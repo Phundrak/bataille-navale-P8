@@ -1,3 +1,8 @@
+/**
+ * \file utils.c
+ * \brief Contient des fonctions utilitaires pour le programme
+ */
+
 #include <signal.h>
 #include <stdio.h>
 #include <curses.h>

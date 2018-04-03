@@ -22,39 +22,39 @@ void nothing() {}
  * return 1 si le test a passé, sinon 0
  */
 TEST(sink_test) {
-	game_state_t gs = {0};
+	game_state_t game_state = {0};
 
 	int maxd = 0;
-	for (int i = 0; i < NBBOATS; ++i) {
-		if (Pieces[i].width > maxd)
-			maxd = Pieces[i].width;
-		if (Pieces[i].height > maxd)
-			maxd = Pieces[i].height;
+	for (int loop = 0; loop < NBBOATS; ++loop) {
+		if (Pieces[loop].width > maxd)
+			maxd = Pieces[loop].width;
+		if (Pieces[loop].height > maxd)
+			maxd = Pieces[loop].height;
 	}
 
-	gs.height = gs.width = maxd;
+	game_state.height = game_state.width = (size_t) maxd;
 	player_t admin = {.owned_rect = {{-1, -1}, {-1, -1}}, .setup_boats = nothing};
-	player_t victime = {.setup_boats = nothing};
-	gs.camps = darrayNew(sizeof(camp_t *));
-	gs.camp_allocator = newSingleAllocator();
+	player_t victime = (player_t) {.setup_boats = nothing};
+	game_state.camps = darrayNew(sizeof(camp_t *));
+	game_state.camp_allocator = newSingleAllocator();
 	admin.name = "Administrateur";
-	gs.camp_allocator->put_in_camp(gs.camp_allocator, &gs, &victime);
-	gs.camp_allocator->put_in_camp(gs.camp_allocator, &gs, &admin);
+	game_state.camp_allocator->put_in_camp(game_state.camp_allocator, &game_state, &victime);
+	game_state.camp_allocator->put_in_camp(game_state.camp_allocator, &game_state, &admin);
 	admin.owned_rect[0] = (point_t) {-1, -1};
 	admin.owned_rect[1] = (point_t) {-1, -1};
 	victime.owned_rect[0] = (point_t) {0, 0};
-	victime.owned_rect[1] = (point_t) {maxd, maxd};
-	gs.grid = calloc(sizeof(cell_t), maxd * maxd);
-	for (int i = 0; i < NBBOATS; ++i) {
-		memset(gs.grid, 0, sizeof(cell_t) * maxd * maxd);
-		blitToGrid(&Pieces[i], (point_t){0, 0}, &gs, 1);
-		result_t r = MISS;
-		for (int y = 0; r != SUNK && y < maxd; ++y) {
-			for (int x = 0; r != SUNK && x < maxd; ++x) {
-				r = doAction(&gs, &admin, (point_t){x, y});
+	victime.owned_rect[1] = (point_t) {(size_t) maxd, (size_t) maxd};
+	game_state.grid = calloc(sizeof(cell_t), maxd * maxd);
+	for (int outer_loop = 0; outer_loop < NBBOATS; ++outer_loop) {
+		memset(game_state.grid, 0, sizeof(cell_t) * maxd * maxd);
+		blitToGrid(&Pieces[outer_loop], (point_t){0, 0}, &game_state, 1);
+		result_t result = MISS;
+		for (size_t coords_x = 0; result != SUNK && coords_x < maxd; ++coords_x) {
+			for (size_t coords_y = 0; result != SUNK && coords_y < maxd; ++coords_y) {
+				result = doAction(&game_state, &admin, (point_t){coords_y, coords_x});
 			}
 		}
-		if (r != SUNK)
+		if (result != SUNK)
 			return 0;
 	}
 	return 1;
@@ -68,30 +68,30 @@ TEST(end_game) {
 	game_state_t *game = newGame((option_t) {15, 15});
 
 	{
-		player_t *p = newDumbPlayer();
-		p->name = "Bot 1";
-		game->camp_allocator->put_in_camp(game->camp_allocator, game, p);
-		p = newDumbPlayer();
-		p->name = "Bot 2";
-		game->camp_allocator->put_in_camp(game->camp_allocator, game, p);
+		player_t *player = newDumbPlayer();
+		player->name = "Bot 1";
+		game->camp_allocator->put_in_camp(game->camp_allocator, game, player);
+		player = newDumbPlayer();
+		player->name = "Bot 2";
+		game->camp_allocator->put_in_camp(game->camp_allocator, game, player);
 	}
 
 	while (1) {
-		for(unsigned i = 0; i < darraySize(game->camps); ++i) {
-			camp_t *camp = *(camp_t **)darrayGet(game->camps, i);
+		for(unsigned nr_camps = 0; nr_camps < darraySize(game->camps); ++nr_camps) {
+			camp_t *camp = *(camp_t **)darrayGet(game->camps, nr_camps);
 			player_t *players = *(player_t**)darrayGet(camp->players, 0);
-			size_t n = darraySize(camp->players);
-			while (n--) {
+			size_t nr_players = darraySize(camp->players);
+			while (nr_players--) {
 				if (players->n_boats == 0) {
 					++players;
 					continue;
 				}
 				point_t coordinates;
-				result_t r;
+				result_t result;
 				do {
 					coordinates = players->get_action(players, game);
-					r = doAction(game, players, coordinates);
-				} while(r == REDO);
+					result = doAction(game, players, coordinates);
+				} while(result == REDO);
 				if (!turnEndUpdate(game))
 					goto end;
 				++players;
@@ -102,9 +102,9 @@ TEST(end_game) {
 end:;
 
 	// Fin du jeu, nettoyage
-	for (unsigned i = 0; i < darraySize(game->camps); ++i) {
-		camp_t *c = *(camp_t**)darrayGet(game->camps, i);
-		deleteCamp(c);
+	for (unsigned nr_camps = 0; nr_camps < darraySize(game->camps); ++nr_camps) {
+		camp_t *camp = *(camp_t**)darrayGet(game->camps, nr_camps);
+		deleteCamp(camp);
 	}
 	darrayDelete(game->camps);
 	free(game->grid);
