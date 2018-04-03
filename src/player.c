@@ -267,6 +267,10 @@ color_t *stateToView(game_state_t *game, player_t *filter) {
 	return arr;
 }
 
+/**
+ * `transpose` transforme une pièce en-place en sa version transposée
+ * \param pièce La pièce à transposer
+ */
 void transpose(piece_t *piece) {
 	char tmp[piece->width * piece->height];
 	memset(tmp, 0, sizeof(tmp));
@@ -280,6 +284,12 @@ void transpose(piece_t *piece) {
 	piece->height = (char) width;
 }
 
+/**
+ * `strrev` est une implémentation de la fonction non-standard strrev définie
+ * dans certaines lib c. Elle inverse en-place une chaine de caractères.
+ * \param str Pointeur vers la chaine à inverser
+ * \return La même valeur que str.
+ */
 char *strrev(char *str) {
 	char *character = str;
 	while (*character) ++character;
@@ -294,7 +304,6 @@ char *strrev(char *str) {
 	}
 	return str;
 }
-
 
 /**
  * `rotate` effectue un certain nombre de rotation à 90° d'une pièce dans le sens horaire
